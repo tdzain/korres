@@ -12,6 +12,7 @@ const mono = Roboto_Mono({ subsets: ['latin'], weight: ['300', '400', '500'], va
 const hand = Reenie_Beanie({ subsets: ['latin'], weight: '400', variable: '--font-reenie', display: 'swap' })
 
 export const metadata: Metadata = {
+  metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL ?? 'https://korres-brasil.pages.dev'),
   title: { default: `${brand.name} | Cosméticos naturais da Grécia`, template: `%s | ${brand.name}` },
   description: 'Skincare, corpo e banho e fragrâncias KORRES. Nascida e feita na Grécia. Frete e prazo calculados para a sua cidade, Pix com 5% off e até 6x sem juros.',
   icons: { icon: '/favicon.svg' },

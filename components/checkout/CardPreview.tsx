@@ -1,5 +1,5 @@
 'use client'
-import { motion } from 'motion/react'
+import { m as motion } from 'motion/react'
 import { brandLabel, type CardBrand } from '@/lib/validators/card'
 
 /** Cartão ilustrado: vira para mostrar o verso ao focar no CVV. */

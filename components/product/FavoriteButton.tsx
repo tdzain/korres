@@ -1,5 +1,5 @@
 'use client'
-import { motion } from 'motion/react'
+import { m as motion } from 'motion/react'
 import { useFavorites } from '@/lib/store/favorites'
 import { useToast } from '@/lib/store/toast'
 import { cn } from '@/lib/cn'

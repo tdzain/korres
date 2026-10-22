@@ -6,13 +6,14 @@
   "scripts": {
     "dev": "next dev",
     "build": "next build",
-    "start": "npx serve out -l 3000",
+    "start": "wrangler pages dev --port 3000",
     "lint": "eslint .",
     "typecheck": "tsc --noEmit",
     "test": "vitest run",
     "pages:dev": "wrangler pages dev out --port 8788",
     "deploy": "npm run build && wrangler pages deploy out --project-name korres-brasil --branch main",
-    "e2e": "playwright test"
+    "e2e": "playwright test",
+    "catalog": "node scripts/scrape-shopkorres.mjs && node scripts/build-catalog.mjs"
   },
   "devDependencies": {
     "@axe-core/playwright": "^4.14.0",

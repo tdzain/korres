@@ -24,6 +24,8 @@ for (const [name, src] of jobs) {
   let img = sharp(src)
   // Recorta a faixa de ícones do infográfico na borda direita.
   if (name === 'col-smart-yoghurt') img = img.extract({ left: 0, top: 0, width: 800, height: 1000 })
-  await img.resize({ width: 1100, withoutEnlargement: true }).webp({ quality: 80 }).toFile(`public/editorial/${name}.webp`)
+  const buf = await img.toBuffer()
+  await sharp(buf).resize({ width: 1100, withoutEnlargement: true }).webp({ quality: 80 }).toFile(`public/editorial/${name}.webp`)
+  await sharp(buf).resize({ width: 640, withoutEnlargement: true }).webp({ quality: 78 }).toFile(`public/editorial/${name}-640.webp`)
   console.log('ok', name)
 }

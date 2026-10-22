@@ -1,5 +1,5 @@
 'use client'
-import { AnimatePresence, motion } from 'motion/react'
+import { AnimatePresence, m as motion } from 'motion/react'
 import QRCode from 'qrcode'
 import { useEffect, useState } from 'react'
 import { Button } from '@/components/ui/Button'
@@ -67,7 +67,7 @@ function Ring({ remaining, total }: { remaining: number; total: number }) {
   const mm = Math.floor(remaining / 60000)
   const ss = Math.floor((remaining % 60000) / 1000)
   return (
-    <div className="relative size-[84px]" role="timer" aria-label={`Expira em ${mm} minutos e ${ss} segundos`}>
+    <div className="relative size-[84px] shrink-0" role="timer" aria-label={`Expira em ${mm} minutos e ${ss} segundos`}>
       <svg viewBox="0 0 84 84" className="size-full -rotate-90">
         <circle cx="42" cy="42" r={r} fill="none" stroke="#e4e6f4" strokeWidth="4" />
         <circle cx="42" cy="42" r={r} fill="none" stroke="#061096" strokeWidth="4" strokeDasharray={c} strokeDashoffset={c * (1 - pct)} strokeLinecap="butt" style={{ transition: 'stroke-dashoffset 1s linear' }} />

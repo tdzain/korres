@@ -1,5 +1,5 @@
 'use client'
-import { motion } from 'motion/react'
+import { m as motion } from 'motion/react'
 import { FREE_SHIPPING_THRESHOLD } from '@/config/shipping'
 import { AnimatedNumber } from '@/components/ui/AnimatedNumber'
 import { TruckIcon } from '@/components/ui/Icons'

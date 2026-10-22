@@ -1,5 +1,5 @@
 'use client'
-import { AnimatePresence, motion } from 'motion/react'
+import { AnimatePresence, m as motion } from 'motion/react'
 import { useEffect, useState } from 'react'
 import { DEMO_CITIES } from '@/data/brazil'
 import { cn } from '@/lib/cn'
@@ -35,7 +35,7 @@ export function DemoPanel() {
   }
 
   return (
-    <div className="fixed bottom-[78px] left-3 z-[75] max-w-[calc(100vw-24px)] text-[12px] lg:bottom-3" data-testid="demo-panel">
+    <div className="fixed bottom-[78px] right-3 z-[75] lg:left-3 lg:right-auto max-w-[calc(100vw-24px)] text-[12px] lg:bottom-3" data-testid="demo-panel">
       <AnimatePresence initial={false} mode="wait">
         {open ? (
           <motion.div key="open" initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: 12 }} className="w-[250px] border border-brand bg-white p-3 shadow-[0_8px_30px_rgb(6_16_150/0.2)]">

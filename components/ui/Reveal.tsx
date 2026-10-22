@@ -1,5 +1,5 @@
 'use client'
-import { motion } from 'motion/react'
+import { m as motion } from 'motion/react'
 import type { ReactNode } from 'react'
 
 /** Reveal on scroll: opacity + translateY(16px), uma vez só. */

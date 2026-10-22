@@ -77,11 +77,11 @@ export function Checkbox({ label, ...rest }: InputHTMLAttributes<HTMLInputElemen
   )
 }
 
-/** Opção em cartão (rádio). */
+/** Opção em cartão (rádio). O <label> cobre só o cabeçalho; o conteúdo expandido (formulários) fica fora dele. */
 export function RadioCard({ checked, onChange, name, value, title, meta, right, children, highlight }: { checked: boolean; onChange: () => void; name: string; value: string; title: ReactNode; meta?: ReactNode; right?: ReactNode; children?: ReactNode; highlight?: boolean }) {
   return (
-    <label className={cn('block cursor-pointer border transition-colors duration-300 has-[:focus-visible]:outline has-[:focus-visible]:outline-2 has-[:focus-visible]:outline-offset-2 has-[:focus-visible]:outline-brand', checked ? 'border-brand bg-white' : 'border-hairline bg-white hover:border-brand', highlight && !checked && 'bg-tint')}>
-      <div className="flex items-start gap-3 p-4">
+    <div className={cn('border transition-colors duration-300 has-[:focus-visible]:outline has-[:focus-visible]:outline-2 has-[:focus-visible]:outline-offset-2 has-[:focus-visible]:outline-brand', checked ? 'border-brand bg-white' : 'border-hairline bg-white hover:border-brand', highlight && !checked && 'bg-tint')}>
+      <label className="flex cursor-pointer items-start gap-3 p-4">
         <input type="radio" className="sr-only" name={name} value={value} checked={checked} onChange={onChange} />
         <span className={cn('mt-[3px] grid size-4 shrink-0 place-items-center rounded-full border', checked ? 'border-brand' : 'border-hairline')} aria-hidden>
           <span className={cn('size-2 rounded-full bg-brand transition-transform duration-300', checked ? 'scale-100' : 'scale-0')} />
@@ -93,8 +93,8 @@ export function RadioCard({ checked, onChange, name, value, title, meta, right, 
           </div>
           {meta && <div className="mt-0.5 text-[13px] font-light leading-snug text-body">{meta}</div>}
         </div>
-      </div>
+      </label>
       {children}
-    </label>
+    </div>
   )
 }

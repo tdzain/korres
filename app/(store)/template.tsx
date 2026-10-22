@@ -1,7 +1,4 @@
-'use client'
-import { motion } from 'motion/react'
-
-/** Transição de página sutil (fade 200ms). */
+/** Transição de página sutil (fade 200ms) em CSS puro: não depende de hidratação, então não atrasa o LCP. */
 export default function Template({ children }: { children: React.ReactNode }) {
-  return <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.2, ease: 'easeOut' }}>{children}</motion.div>
+  return <div className="page-fade">{children}</div>
 }

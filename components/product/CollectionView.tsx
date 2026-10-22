@@ -1,5 +1,5 @@
 'use client'
-import { AnimatePresence, motion } from 'motion/react'
+import { AnimatePresence, m as motion } from 'motion/react'
 import { useMemo, useState } from 'react'
 import { ProductCard, ProductCardSkeleton } from '@/components/product/ProductCard'
 import { Button } from '@/components/ui/Button'
@@ -127,7 +127,7 @@ export function CollectionView({ collection, products }: { collection: Collectio
         <div className="hairline-clip">
           <div className="hairline-grid" data-testid="plp-grid">
             {shown.map((p, i) => (
-              <motion.div key={p.id} layout="position" initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5, delay: (i % PAGE) * 0.04, ease: [0.22, 1, 0.36, 1] }}>
+              <motion.div key={p.id} layout="position" initial={i < 4 ? false : { opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5, delay: (i % PAGE) * 0.04, ease: [0.22, 1, 0.36, 1] }}>
                 <ProductCard product={p} priority={i < 4} />
               </motion.div>
             ))}

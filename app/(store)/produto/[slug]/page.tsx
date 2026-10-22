@@ -1,7 +1,7 @@
 import type { Metadata } from 'next'
 import { notFound } from 'next/navigation'
 import { ProductInfo } from '@/components/product/ProductInfo'
-import { EthicsBanner, Related } from '@/components/product/ProductExtras'
+import { EthicsBanner, ProductVideo, Related } from '@/components/product/ProductExtras'
 import { Reviews } from '@/components/product/Reviews'
 import { allProducts, categoryFor } from '@/lib/commerce/catalog'
 import { getCommerce } from '@/lib/commerce/provider'
@@ -25,6 +25,7 @@ export default async function ProductPage({ params }: { params: Promise<{ slug: 
   return (
     <>
       <ProductInfo product={product} categoryLabel={categoryFor(product)} />
+      <ProductVideo product={product} />
       <Reviews product={product} />
       <EthicsBanner />
       <Related product={product} />

@@ -4,8 +4,8 @@ import { FlatCompat } from '@eslint/eslintrc'
 
 const compat = new FlatCompat({ baseDirectory: dirname(fileURLToPath(import.meta.url)) })
 
-export default [
-  { ignores: ['.next/**', 'out/**', 'node_modules/**', 'public/**', 'scripts/**', 'docs/**', '.wrangler/**', 'playwright-report/**', 'test-results/**'] },
+const config = [
+  { ignores: ['next-env.d.ts', '.next/**', 'out/**', 'node_modules/**', 'public/**', 'scripts/**', 'docs/**', '.wrangler/**', 'playwright-report/**', 'test-results/**'] },
   ...compat.extends('next/core-web-vitals', 'next/typescript'),
   {
     rules: {
@@ -14,3 +14,5 @@ export default [
     },
   },
 ]
+
+export default config

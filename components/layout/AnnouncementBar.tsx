@@ -1,5 +1,5 @@
 'use client'
-import { AnimatePresence, motion } from 'motion/react'
+import { AnimatePresence, m as motion } from 'motion/react'
 import { useEffect, useState } from 'react'
 import { FREE_SHIPPING_THRESHOLD } from '@/config/shipping'
 import { formatBRL } from '@/lib/format/money'

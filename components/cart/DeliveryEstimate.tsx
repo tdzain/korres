@@ -1,5 +1,5 @@
 'use client'
-import { AnimatePresence, motion } from 'motion/react'
+import { AnimatePresence, m as motion } from 'motion/react'
 import { AnimatedNumber } from '@/components/ui/AnimatedNumber'
 import { formatShortDate } from '@/lib/format/date'
 import { arrivalText, pickOption, type ShippingMethodId } from '@/lib/shipping/quote'

@@ -1,5 +1,5 @@
 'use client'
-import { MotionConfig } from 'motion/react'
+import { LazyMotion, MotionConfig } from 'motion/react'
 import { useEffect, type ReactNode } from 'react'
 import { useAccount } from '@/lib/store/account'
 import { useCart } from '@/lib/store/cart'
@@ -9,6 +9,8 @@ import { useOrders } from '@/lib/store/orders'
 import { usePrefs } from '@/lib/store/prefs'
 import { useReady } from '@/lib/store/ready'
 import { useDemo } from '@/lib/store/ui'
+
+const loadFeatures = () => import('@/lib/motionFeatures').then((r) => r.default)
 
 /** Reidrata os stores (skipHydration evita mismatch de SSR), ativa ?demo=1 e dispara a detecção de cidade. */
 function StoreHydrator() {
@@ -34,8 +36,11 @@ function StoreHydrator() {
 export function Providers({ children }: { children: ReactNode }) {
   return (
     <MotionConfig reducedMotion="user">
-      <StoreHydrator />
-      {children}
+      {/* Recursos de animação (incluindo layout) carregados fora do caminho crítico. */}
+      <LazyMotion features={loadFeatures}>
+        <StoreHydrator />
+        {children}
+      </LazyMotion>
     </MotionConfig>
   )
 }

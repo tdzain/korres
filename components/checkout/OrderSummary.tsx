@@ -1,5 +1,5 @@
 'use client'
-import { AnimatePresence, motion } from 'motion/react'
+import { AnimatePresence, m as motion } from 'motion/react'
 import { useState } from 'react'
 import { AnimatedNumber } from '@/components/ui/AnimatedNumber'
 import { LockIcon, ShieldIcon, CheckIcon, CloseIcon } from '@/components/ui/Icons'

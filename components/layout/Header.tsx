@@ -1,6 +1,6 @@
 'use client'
 import Link from 'next/link'
-import { AnimatePresence, motion } from 'motion/react'
+import { AnimatePresence, m as motion } from 'motion/react'
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { MEGA, NAV, SEASONAL } from '@/data/menu'
 import { bestSellers } from '@/lib/commerce/catalog'

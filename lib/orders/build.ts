@@ -30,7 +30,7 @@ export function computeTotals({ subtotal, couponPercent = 0, payment, shipping }
 export function newOrderId(): string {
   const alphabet = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789'
   const bytes = new Uint8Array(8)
-  globalThis.crypto.getRandomValues(bytes)
+  crypto.getRandomValues(bytes)
   return 'KR' + Array.from(bytes, (b) => alphabet[b % alphabet.length]).join('')
 }
 

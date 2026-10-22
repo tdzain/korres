@@ -1,5 +1,5 @@
 'use client'
-import { AnimatePresence, motion } from 'motion/react'
+import { AnimatePresence, m as motion } from 'motion/react'
 import Link from 'next/link'
 import { useState } from 'react'
 import { usePrefs } from '@/lib/store/prefs'

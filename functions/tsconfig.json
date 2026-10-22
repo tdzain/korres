@@ -11,5 +11,5 @@
     "types": ["@cloudflare/workers-types"],
     "paths": { "@/*": ["../*"] }
   },
-  "include": ["./**/*.ts", "../lib/**/*.ts", "../config/**/*.ts", "../data/**/*.ts"]
+  "include": ["./**/*.ts"]
 }

@@ -1,6 +1,6 @@
 'use client'
 import Link from 'next/link'
-import { AnimatePresence, motion } from 'motion/react'
+import { AnimatePresence, m as motion } from 'motion/react'
 import { useMemo } from 'react'
 import { Button } from '@/components/ui/Button'
 import { AnimatedNumber } from '@/components/ui/AnimatedNumber'

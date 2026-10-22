@@ -1,5 +1,5 @@
 'use client'
-import { AnimatePresence, motion } from 'motion/react'
+import { AnimatePresence, m as motion } from 'motion/react'
 import { PinIcon } from '@/components/ui/Icons'
 import { useLocation } from '@/lib/store/location'
 import { cn } from '@/lib/cn'

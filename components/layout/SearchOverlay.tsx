@@ -2,7 +2,7 @@
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { useDeferredValue, useEffect, useRef, useState } from 'react'
-import { AnimatePresence, motion } from 'motion/react'
+import { AnimatePresence, m as motion } from 'motion/react'
 import { POPULAR_SEARCHES } from '@/data/menu'
 import { searchProducts } from '@/lib/commerce/catalog'
 import { formatBRL } from '@/lib/format/money'

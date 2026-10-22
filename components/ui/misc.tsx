@@ -1,5 +1,5 @@
 'use client'
-import { LayoutGroup, motion } from 'motion/react'
+import { LayoutGroup, m as motion } from 'motion/react'
 import { useEffect, useId, useRef, useState, type ReactNode } from 'react'
 import { cn } from '@/lib/cn'
 import { discountPercent, formatBRL } from '@/lib/format/money'

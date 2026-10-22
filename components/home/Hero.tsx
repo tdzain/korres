@@ -1,6 +1,6 @@
 'use client'
-import { AnimatePresence, motion } from 'motion/react'
-import { useEffect, useState } from 'react'
+import { AnimatePresence, m as motion } from 'motion/react'
+import { useEffect, useRef, useState } from 'react'
 import { Button } from '@/components/ui/Button'
 import { MaskLines } from '@/components/ui/Reveal'
 import { cn } from '@/lib/cn'
@@ -14,10 +14,12 @@ const SLIDES = [
 /** Hero dividido 50/50: texto à esquerda (acento manuscrito + mono + botão outline) e imagem full-bleed à direita. */
 export function Hero() {
   const [i, setI] = useState(0)
+  const changed = useRef(false)
   const [paused, setPaused] = useState(false)
+  const first = i === 0 && !changed.current
   useEffect(() => {
     if (paused) return
-    const id = setInterval(() => setI((n) => (n + 1) % SLIDES.length), 7000)
+    const id = setInterval(() => { changed.current = true; setI((n) => (n + 1) % SLIDES.length) }, 7000)
     return () => clearInterval(id)
   }, [paused])
   const s = SLIDES[i]!
@@ -36,26 +38,29 @@ export function Hero() {
         </AnimatePresence>
         <div className="absolute bottom-6 left-4 flex gap-2" role="tablist" aria-label="Selecionar destaque">
           {SLIDES.map((d, n) => (
-            <button key={d.id} type="button" role="tab" aria-selected={n === i} aria-label={`Destaque ${n + 1}`} onClick={() => setI(n)} className="grid size-6 place-items-center">
+            <button key={d.id} type="button" role="tab" aria-selected={n === i} aria-label={`Destaque ${n + 1}`} onClick={() => { changed.current = true; setI(n) }} className="grid size-6 place-items-center">
               <span className={cn('block h-[5px] transition-all duration-500 ease-[var(--ease-out)]', n === i ? 'w-8 bg-brand' : 'w-[5px] bg-[#cfd1e6]')} />
             </button>
           ))}
         </div>
       </div>
       <div className="relative aspect-[4/5] overflow-hidden bg-surface lg:aspect-auto">
-        <AnimatePresence mode="sync">
+        {/* 1º slide: visível já no HTML (zoom-out em CSS); demais: crossfade com Motion. Assim o LCP não espera o JS. */}
+        <AnimatePresence mode="sync" initial={false}>
           <motion.img
             key={s.id}
             src={s.img}
+            srcSet={`${s.img.replace('.webp', '-640.webp')} 640w, ${s.img} 1100w`}
+            sizes="(min-width:1024px) 50vw, 100vw"
             alt={s.alt}
             width={1100}
             height={1100}
-            fetchPriority={i === 0 ? 'high' : undefined}
-            initial={{ opacity: 0, scale: 1.08 }}
+            fetchPriority={first ? 'high' : undefined}
+            initial={first ? false : { opacity: 0, scale: 1.08 }}
             animate={{ opacity: 1, scale: 1 }}
             exit={{ opacity: 0 }}
             transition={{ duration: 1.4, ease: [0.22, 1, 0.36, 1] }}
-            className="absolute inset-0 h-full w-full object-cover"
+            className={`absolute inset-0 h-full w-full object-cover ${first ? 'hero-zoom' : ''}`}
             style={{ objectPosition: s.pos }}
           />
         </AnimatePresence>

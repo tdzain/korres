@@ -1,5 +1,5 @@
 'use client'
-import { AnimatePresence, motion } from 'motion/react'
+import { AnimatePresence, m as motion } from 'motion/react'
 import { useState, type ReactNode } from 'react'
 import { cn } from '@/lib/cn'
 import { MinusIcon, PlusIcon } from './Icons'

@@ -1,6 +1,6 @@
 'use client'
 import Link from 'next/link'
-import { motion, useMotionValue, useSpring } from 'motion/react'
+import { m as motion, useMotionValue, useSpring } from 'motion/react'
 import { useRef, type ButtonHTMLAttributes, type ReactNode } from 'react'
 import { cn } from '@/lib/cn'
 import { ChevronRightIcon } from './Icons'

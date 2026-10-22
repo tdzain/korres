@@ -1,6 +1,6 @@
 'use client'
 import { zodResolver } from '@hookform/resolvers/zod'
-import { AnimatePresence, motion } from 'motion/react'
+import { AnimatePresence, m as motion } from 'motion/react'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
@@ -245,7 +245,7 @@ export function CheckoutPage() {
               <AnimatePresence initial={false}>
                 {card && (
                   <motion.div initial={{ height: 0, opacity: 0 }} animate={{ height: 'auto', opacity: 1 }} exit={{ height: 0, opacity: 0 }} transition={{ duration: 0.35, ease: [0.22, 1, 0.36, 1] }} className="overflow-hidden">
-                    <div className="space-y-3 border-t border-hairline p-4" onClick={(e) => e.stopPropagation()}>
+                    <div className="space-y-3 border-t border-hairline p-4">
                       <CardPreview number={v.cardNumber ?? ''} name={v.cardName ?? ''} expiry={v.cardExpiry ?? ''} cvv={v.cardCvv ?? ''} brand={brand} flipped={flip} />
                       <Field label="Número do cartão" autoComplete="cc-number" inputMode="numeric" error={errors.cardNumber?.message} suffix={brand !== 'unknown' ? <span className="font-mono text-[11px] uppercase">{brandLabel[brand]}</span> : undefined} {...mask('cardNumber', maskCardNumber)} />
                       <Field label="Nome impresso no cartão" autoComplete="cc-name" error={errors.cardName?.message} {...register('cardName')} />

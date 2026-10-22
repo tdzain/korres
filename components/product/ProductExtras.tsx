@@ -33,3 +33,22 @@ export function Related({ product: p }: { product: Product }) {
     </section>
   )
 }
+
+/** Bloco de vídeo (somente produtos da linha Pure Greek Olive, que têm filme próprio). Carrega sob demanda. */
+export function ProductVideo({ product: p }: { product: Product }) {
+  if (p.lineSlug !== 'pure-greek-olive' && !p.slug.includes('pure-greek-olive')) return null
+  return (
+    <section aria-label="Vídeo" className="grid border-b border-hairline lg:grid-cols-2">
+      <div className="flex flex-col justify-center border-hairline px-4 py-12 lg:border-r lg:px-14">
+        <p className="t-mono">Pure Greek Olive</p>
+        <h2 className="t-section mt-3">Veja em movimento</h2>
+        <p className="mt-5 max-w-[480px] text-[15px] font-normal leading-relaxed text-body">O azeite extravirgem grego, colhido e prensado com cuidado, em um ritual de hidratação para rosto, corpo e cabelo.</p>
+      </div>
+      <div className="relative aspect-video bg-surface lg:aspect-auto lg:min-h-[420px]">
+        <video className="absolute inset-0 h-full w-full object-cover" controls playsInline preload="none" poster="/editorial/col-olive.webp" aria-label="Vídeo do ritual Pure Greek Olive">
+          <source src="/video/pure-greek-olive.mp4" type="video/mp4" />
+        </video>
+      </div>
+    </section>
+  )
+}
