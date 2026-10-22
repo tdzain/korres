@@ -53,7 +53,7 @@ export function SearchOverlay() {
                 {recent.length > 0 && (
                   <section className="mb-6">
                     <div className="flex items-center justify-between"><h3 className="t-caps text-brand">Buscas recentes</h3><button type="button" onClick={clear} className="t-mono underline">limpar</button></div>
-                    <ul className="mt-3 flex flex-col">{recent.map((r) => <li key={r}><button type="button" onClick={() => go(r)} className="link-underline py-1 text-[14px] font-normal text-brand">{r}</button></li>)}</ul>
+                    <ul className="mt-3 flex flex-col">{recent.map((r) => <li key={r}><button type="button" onClick={() => go(r)} className="link-underline min-h-11 py-2 text-[15px] font-normal text-brand">{r}</button></li>)}</ul>
                   </section>
                 )}
                 <section>

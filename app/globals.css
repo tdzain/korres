@@ -19,6 +19,7 @@
 
   --ease-out: cubic-bezier(0.22, 1, 0.36, 1);
   --ease-in-out: cubic-bezier(0.65, 0, 0.35, 1);
+  --ease-ios: cubic-bezier(0.32, 0.72, 0, 1);
 
   --breakpoint-xl: 80rem;
   --breakpoint-2xl: 90rem;
@@ -36,7 +37,9 @@
 }
 
 @layer base {
-  html { -webkit-text-size-adjust: 100%; }
+  html { -webkit-text-size-adjust: 100%; -webkit-tap-highlight-color: transparent; scroll-padding-top: 80px; }
+  /* HIG: evita atraso de toque e zoom por duplo toque nos controles */
+  a, button, input, select, textarea, label, [role='button'] { touch-action: manipulation; }
   body {
     background: #fff;
     color: var(--color-body);
@@ -82,7 +85,8 @@
   .scroll-x > * { scroll-snap-align: start; }
 }
 
-@keyframes page-fade { from { opacity: 0.001; } to { opacity: 1; } }
+@keyframes vt-out { to { opacity: 0; transform: translateY(-6px); } }
+@keyframes vt-in { from { opacity: 0; transform: translateY(10px); } }
 @keyframes hero-zoom { from { transform: scale(1.08); } to { transform: scale(1); } }
 @keyframes shimmer { to { transform: translateX(100%); } }
 @keyframes shake { 0%, 100% { transform: translateX(0); } 20% { transform: translateX(-4px); } 40% { transform: translateX(4px); } 60% { transform: translateX(-3px); } 80% { transform: translateX(2px); } }
@@ -92,7 +96,6 @@
 @keyframes bump { 0% { transform: scale(1); } 35% { transform: scale(1.5); } 100% { transform: scale(1); } }
 @keyframes pulse-dot { 0%, 100% { opacity: 1; } 50% { opacity: 0.35; } }
 
-.page-fade { animation: page-fade 0.2s ease-out; }
 .hero-zoom { animation: hero-zoom 1.4s var(--ease-out); }
 .anim-shake { animation: shake 0.4s var(--ease-out); }
 .anim-flash { animation: flash-fill 1.1s var(--ease-out); }
@@ -102,6 +105,19 @@
 .anim-pulse { animation: pulse-dot 1.4s ease-in-out infinite; }
 
 @media (prefers-reduced-motion: reduce) {
+  ::view-transition-group(*), ::view-transition-old(*), ::view-transition-new(*) { animation: none !important; }
   *, *::before, *::after { animation-duration: 0.001ms !important; animation-iteration-count: 1 !important; transition-duration: 0.001ms !important; scroll-behavior: auto !important; }
   .skeleton::after { display: none; }
 }
+
+/* Transições entre telas: a antiga sai rápido, a nova entra com deslize curto (curva estilo iOS). */
+::view-transition-old(page) { animation: vt-out 180ms var(--ease-in-out) both; }
+::view-transition-new(page) { animation: vt-in 380ms var(--ease-ios) 60ms both; }
+::view-transition-group(*) { animation-duration: 380ms; animation-timing-function: var(--ease-ios); }
+
+/* Áreas seguras (iPhone com notch/home indicator) */
+.pb-safe { padding-bottom: max(12px, env(safe-area-inset-bottom)); }
+.pb-safe-lg { padding-bottom: max(16px, env(safe-area-inset-bottom)); }
+
+/* Textos auxiliares mais legíveis no celular */
+@media (max-width: 767px) { .t-mono { font-size: 13px; } }

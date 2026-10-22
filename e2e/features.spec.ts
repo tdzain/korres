@@ -53,3 +53,45 @@ test('404 de marca e institucionais', async ({ page }) => {
   expect(res?.status()).toBe(404)
   await expect(page.getByText('Página não encontrada')).toBeVisible()
 })
+
+test('cards: "Adicionar" vira controle de quantidade no próprio lugar', async ({ page, isMobile }) => {
+  await mockExternal(page)
+  await page.goto('/colecao/corpo/')
+  const card = page.getByTestId('product-card').first()
+  if (!isMobile) await card.hover()
+  const add = card.locator('[data-testid="quick-add"]:visible')
+  await add.click()
+  const qty = card.locator('[data-testid="quick-qty"]:visible')
+  await expect(qty).toHaveText('1 na sacola')
+  await card.getByRole('button', { name: 'Aumentar quantidade' }).locator('visible=true').click()
+  await expect(qty).toHaveText('2 na sacola')
+  await expect(page.getByTestId('bag-button')).toContainText('2')
+  await card.getByRole('button', { name: 'Diminuir quantidade' }).locator('visible=true').click()
+  await card.getByRole('button', { name: /Remover .* da sacola/ }).locator('visible=true').click()
+  await expect(card.locator('[data-testid="quick-add"]:visible')).toBeVisible()
+  await expect(page.getByTestId('bag-button')).toContainText('0')
+})
+
+test('PDP: acordeões abertos nunca ficam cortados (a coluna deixa de ser sticky quando não cabe)', async ({ page }) => {
+  await mockExternal(page)
+  await page.goto('/produto/smart-yoghurt-probiotic-super-serum/')
+  for (const name of ['Resultados clínicos', 'Como usar', 'Ingredientes']) {
+    const btn = page.getByRole('button', { name, exact: true })
+    if (await btn.count()) await btn.click()
+  }
+  const how = page.getByRole('region', { name: 'Como usar' })
+  await how.scrollIntoViewIfNeeded()
+  await expect(how).toBeInViewport()
+  await expect(how).toContainText('Com a pele limpa')
+})
+
+test('PDP mobile: barra fixa com quantidade e valor', async ({ page, isMobile }) => {
+  test.skip(!isMobile, 'somente mobile')
+  await mockExternal(page)
+  await page.goto('/produto/creme-hidratante-deo-para-maos-oliva-e-bergamota/')
+  await page.evaluate(() => window.scrollTo(0, document.body.scrollHeight / 3))
+  const bar = page.getByTestId('sticky-bar')
+  await expect(bar).toBeVisible()
+  await bar.getByRole('button', { name: 'Aumentar quantidade' }).click()
+  await expect(bar).toContainText('R$ 95,60')
+})

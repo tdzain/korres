@@ -110,8 +110,8 @@ export function Header() {
       </div>
 
       {/* Faixa de localização quando o chip não cabe na metade esquerda */}
-      <div className="flex h-8 items-center border-t border-hairline bg-white px-4 xl:hidden">
-        <LocationChip />
+      <div className="flex min-h-8 items-center border-t border-hairline bg-white px-4 py-0.5 xl:hidden">
+        <LocationChip strip />
       </div>
 
       <AnimatePresence>

@@ -9,3 +9,4 @@ test-results
 next-env.d.ts
 .DS_Store
 data/raw
+.omc/

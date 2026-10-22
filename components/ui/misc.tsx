@@ -35,11 +35,11 @@ export function SectionTitle({ title, subtitle, className, as: Tag = 'h2' }: { t
 }
 
 export function Stepper({ value, onChange, min = 0, max = 10, label = 'Quantidade', size = 'md' }: { value: number; onChange: (n: number) => void; min?: number; max?: number; label?: string; size?: 'sm' | 'md' }) {
-  const dim = size === 'sm' ? 'size-8' : 'size-10'
+  const dim = size === 'sm' ? 'size-11 md:size-9' : 'size-11 md:size-10'
   return (
     <div className="inline-flex items-center border border-hairline text-brand" role="group" aria-label={label}>
       <button type="button" className={cn(dim, 'grid place-items-center transition-colors hover:bg-tint disabled:opacity-40')} onClick={() => onChange(value - 1)} disabled={value <= min} aria-label="Diminuir quantidade"><MinusIcon size={14} /></button>
-      <span className={cn('grid min-w-8 place-items-center text-center font-mono text-[14px] font-normal tabular-nums')} aria-live="polite">{value}</span>
+      <span className={cn('grid min-w-9 place-items-center text-center font-mono text-[15px] font-normal tabular-nums')} aria-live="polite">{value}</span>
       <button type="button" className={cn(dim, 'grid place-items-center transition-colors hover:bg-tint disabled:opacity-40')} onClick={() => onChange(value + 1)} disabled={value >= max} aria-label="Aumentar quantidade"><PlusIcon size={14} /></button>
     </div>
   )
@@ -74,7 +74,7 @@ export function VariantChips<T extends { id: string; label: string }>({ options,
               role="radio"
               aria-checked={active}
               onClick={() => onChange(o.id)}
-              className={cn('relative border border-hairline px-4 py-[10px] font-mono text-[13px] font-normal uppercase transition-colors duration-300 -ml-px first:ml-0', active ? 'text-brand' : 'text-muted hover:text-brand')}
+              className={cn('relative min-h-11 border border-hairline px-4 py-[10px] font-mono text-[13px] font-normal uppercase transition-colors duration-300 -ml-px first:ml-0 active:bg-tint', active ? 'text-brand' : 'text-muted hover:text-brand')}
             >
               {active && <motion.span layoutId="chip-ind" className="absolute -inset-px border border-brand" transition={{ type: 'spring', stiffness: 420, damping: 34 }} />}
               <span className="relative">{o.label}</span>
@@ -92,7 +92,7 @@ export function Tabs({ tabs, value, onChange, label }: { tabs: { id: string; lab
     <LayoutGroup id={group}>
       <div role="tablist" aria-label={label} className="flex gap-6 border-b border-hairline">
         {tabs.map((t) => (
-          <button key={t.id} role="tab" aria-selected={t.id === value} id={`tab-${t.id}`} onClick={() => onChange(t.id)} className={cn('relative py-3 text-[14px] uppercase tracking-[0.5px] transition-colors', t.id === value ? 'text-brand' : 'text-muted hover:text-brand')}>
+          <button key={t.id} role="tab" aria-selected={t.id === value} id={`tab-${t.id}`} onClick={() => onChange(t.id)} className={cn('relative min-h-11 py-3 text-[14px] uppercase tracking-[0.5px] transition-colors', t.id === value ? 'text-brand' : 'text-muted hover:text-brand')}>
             {t.label}
             {t.id === value && <motion.span layoutId="tab-ind" className="absolute inset-x-0 -bottom-px h-px bg-brand" />}
           </button>
@@ -119,8 +119,8 @@ export function Carousel({ children, className, itemClass = 'w-[78%] sm:w-[46%] 
   return (
     <div className={cn('relative', className)}>
       <div className="gutter hidden items-center justify-end gap-1 pb-2 lg:flex">
-        <button type="button" aria-label="Anterior" disabled={edge.start} onClick={() => go(-1)} className="grid size-8 place-items-center text-brand disabled:opacity-30"><ChevronLeftIcon size={18} /></button>
-        <button type="button" aria-label="Próximo" disabled={edge.end} onClick={() => go(1)} className="grid size-8 place-items-center text-brand disabled:opacity-30"><ChevronRightIcon size={18} /></button>
+        <button type="button" aria-label="Anterior" disabled={edge.start} onClick={() => go(-1)} className="grid size-11 place-items-center text-brand disabled:opacity-30"><ChevronLeftIcon size={18} /></button>
+        <button type="button" aria-label="Próximo" disabled={edge.end} onClick={() => go(1)} className="grid size-11 place-items-center text-brand disabled:opacity-30"><ChevronRightIcon size={18} /></button>
       </div>
       <div ref={ref} onScroll={update} className="scroll-x flex border-y border-hairline">
         {children.map((c, i) => <div key={i} className={cn('shrink-0 border-r border-hairline', itemClass)}>{c}</div>)}

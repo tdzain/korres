@@ -34,7 +34,7 @@ export function AnnouncementBar() {
           </motion.p>
         </AnimatePresence>
       </div>
-      <button type="button" onClick={close} className="absolute right-4 flex items-center gap-1 text-[13px] text-muted hover:text-brand md:text-[14px]" aria-label="Fechar aviso">
+      <button type="button" onClick={close} className="absolute right-0 flex min-h-[34px] items-center gap-1 px-4 text-[13px] text-muted hover:text-brand md:text-[14px]" aria-label="Fechar aviso">
         <span className="hidden sm:inline">Fechar</span> <CloseIcon size={12} />
       </button>
     </div>

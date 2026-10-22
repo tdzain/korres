@@ -50,7 +50,7 @@ test.describe('caminho feliz: home → PDP → sacola → checkout Pix → confi
     await expect(drawer.getByTestId('cart-line')).toHaveCount(1)
     await expect(drawer.getByTestId('free-shipping-bar')).toContainText('para o frete grátis')
     await expect(drawer.getByTestId('cart-estimate')).toContainText(/Chegará entre/)
-    await drawer.getByRole('link', { name: /Ir para o checkout/i }).click()
+    await drawer.getByRole('link', { name: /Prosseguir com sua compra/i }).click()
 
     // Checkout em uma página
     await expect(page).toHaveURL(/\/checkout\/$/)
@@ -99,6 +99,9 @@ test.describe('caminho feliz: home → PDP → sacola → checkout Pix → confi
     await page.getByTestId('add-to-bag').click()
     await expect(page.getByRole('dialog', { name: 'Sacola de compras' }).getByTestId('cart-line')).toHaveCount(1)
     await page.goto('/checkout/')
+    await expect(page.getByLabel('CPF')).toHaveCount(0) // campos de endereço só aparecem depois do CEP
+    await page.getByLabel('CEP').fill('80010000')
+    await expect(page.getByLabel('Rua')).toHaveValue('Rua José Loureiro')
     await page.getByLabel('CPF').fill('11111111111')
     await page.getByLabel('CPF').blur()
     await expect(page.getByText('CPF inválido')).toBeVisible()
