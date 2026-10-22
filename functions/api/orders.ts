@@ -12,7 +12,13 @@ const schema = z.object({
   }),
   shippingMethod: z.enum(['economica', 'expressa', 'retirada']),
   // Nunca recebemos número, validade ou CVV: só método, parcelas e bandeira.
-  payment: z.object({ method: z.enum(['pix', 'card', 'boleto']), installments: z.number().int().min(1).max(6).optional(), cardBrand: z.string().optional() }),
+  payment: z.object({
+    method: z.enum(['pix', 'card', 'boleto', 'split']),
+    installments: z.number().int().min(1).max(6).optional(),
+    cardBrand: z.string().optional(),
+    // Pagamento combinado: duas partes (Pix + cartão ou dois cartões). A 2ª é sempre o restante.
+    split: z.array(z.object({ method: z.enum(['pix', 'card']), share: z.number().positive(), installments: z.number().int().min(1).max(6).optional(), cardBrand: z.string().optional() })).length(2).optional(),
+  }),
   items: z.array(z.object({
     variantId: z.string(), slug: z.string(), name: z.string(), variantLabel: z.string(), image: z.string(),
     qty: z.number().int().min(1).max(20), unitPrice: z.number().positive(),

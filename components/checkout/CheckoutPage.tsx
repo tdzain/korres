@@ -19,7 +19,10 @@ import { formatShortDate } from '@/lib/format/date'
 import { formatBRL } from '@/lib/format/money'
 import { lookupCep } from '@/lib/geo/client'
 import { computeTotals, findCoupon } from '@/lib/orders/build'
-import { installmentOptions, pixTotal } from '@/lib/pricing'
+import { clampShare, planSplit } from '@/lib/orders/split'
+import { randomCustomer } from '@/lib/demo/random'
+import { roundMoney } from '@/lib/format/money'
+import { pixTotal } from '@/lib/pricing'
 import { arrivalText, pickOption } from '@/lib/shipping/quote'
 import { useAccount } from '@/lib/store/account'
 import { useCart } from '@/lib/store/cart'
@@ -27,13 +30,13 @@ import { useLocation } from '@/lib/store/location'
 import { useCartLines } from '@/lib/store/lines'
 import { useOrders } from '@/lib/store/orders'
 import { useReady } from '@/lib/store/ready'
-import { useDemo } from '@/lib/store/ui'
 import { useShipping } from '@/lib/useShipping'
-import { detectBrand, maskCardNumber, maskExpiry, cvvLength, brandLabel } from '@/lib/validators/card'
+import { detectBrand, brandLabel } from '@/lib/validators/card'
 import { maskCEP } from '@/lib/validators/cep'
 import { maskCPF, onlyDigits } from '@/lib/validators/cpf'
 import { maskPhone } from '@/lib/validators/phone'
-import { CardPreview } from './CardPreview'
+import { CardFields } from './CardFields'
+import { SplitPayment } from './SplitPayment'
 import { type CouponState, SummaryBody } from './OrderSummary'
 import { checkoutSchema, FIELD_ORDER, type CheckoutValues } from './schema'
 
@@ -50,12 +53,12 @@ export function CheckoutPage() {
   const location = useLocation((s) => s.location)
   const setLocation = useLocation((s) => s.set)
   const user = useAccount((s) => s.user)
-  const demo = useDemo((s) => s.enabled)
   const [coupon, setCoupon] = useState<CouponState>({ status: 'idle' })
   const [cepState, setCepState] = useState<'idle' | 'loading' | 'error'>('idle')
   const [flash, setFlash] = useState<Record<string, number>>({})
   const [submitting, setSubmitting] = useState(false)
   const [flip, setFlip] = useState(false)
+  const [pendingSubmit, setPendingSubmit] = useState(false)
   const [summaryOpen, setSummaryOpen] = useState(false)
   // Entrega em duas etapas: só o CEP aparece primeiro; o restante entra (já preenchido) depois da consulta.
   const [revealed, setRevealed] = useState(false)
@@ -65,7 +68,7 @@ export function CheckoutPage() {
   const form = useForm<CheckoutValues>({
     resolver: zodResolver(checkoutSchema),
     mode: 'onTouched',
-    defaultValues: { email: '', phone: '', marketing: true, firstName: '', lastName: '', cpf: '', cep: '', street: '', number: '', complement: '', neighborhood: '', city: '', uf: '', reference: '', shippingMethod: 'economica', payment: 'pix', cardNumber: '', cardName: '', cardExpiry: '', cardCvv: '', installments: 1 },
+    defaultValues: { email: '', phone: '', marketing: true, firstName: '', lastName: '', cpf: '', cep: '', street: '', number: '', complement: '', neighborhood: '', city: '', uf: '', reference: '', shippingMethod: 'economica', payment: 'pix', splitMode: 'pix_card', splitShare: 0, cardNumber: '', cardName: '', cardExpiry: '', cardCvv: '', installments: 1, card2Number: '', card2Name: '', card2Expiry: '', card2Cvv: '', installments2: 1 },
   })
   const { register, watch, setValue, setFocus, handleSubmit, formState: { errors, touchedFields }, trigger } = form
   const v = watch()
@@ -89,7 +92,7 @@ export function CheckoutPage() {
     setCepState('loading')
     const res = await lookupCep(cep)
     setRevealed(true) // com ou sem resultado: se não achou, a pessoa preenche manualmente
-    if (!res) { setCepState('error'); return }
+    if (!res) { setCepState('error'); return false }
     setCepState('idle')
     setValue('street', res.street, { shouldValidate: true })
     setValue('neighborhood', res.neighborhood, { shouldValidate: true })
@@ -98,6 +101,7 @@ export function CheckoutPage() {
     setFlash((f) => ({ street: (f.street ?? 0) + 1, neighborhood: (f.neighborhood ?? 0) + 1, city: (f.city ?? 0) + 1, uf: (f.uf ?? 0) + 1 }))
     setLocation({ city: res.city, uf: res.uf, cep: res.cep, source: 'cep' })
     if (focusNumber) setTimeout(() => setFocus('number'), 120)
+    return true
   }, [setValue, setFocus, setLocation])
   useEffect(() => {
     if (v.cep.length === 9 && v.cep !== lastCep.current) { lastCep.current = v.cep; void fillFromCep(v.cep, typedCep.current) }
@@ -109,9 +113,18 @@ export function CheckoutPage() {
   const shipping = useShipping(subtotal, override)
   const selected = shipping.options.length ? pickOption(shipping.options, v.shippingMethod) : null
   const couponPercent = coupon.status === 'valid' ? (findCoupon(coupon.code)?.percent ?? 0) : 0
-  const totals = useMemo(() => computeTotals({ subtotal, couponPercent, payment: v.payment, shipping: selected?.price ?? 0 }), [subtotal, couponPercent, v.payment, selected?.price])
-  const cardBase = useMemo(() => computeTotals({ subtotal, couponPercent, payment: 'card', shipping: selected?.price ?? 0 }).total, [subtotal, couponPercent, selected?.price])
+  const shippingPrice = selected?.price ?? 0
+  // payable = produtos − cupom + frete, antes do desconto Pix. É a base para parcelas e para dividir o pagamento.
+  const payable = useMemo(() => computeTotals({ subtotal, couponPercent, payment: 'card', shipping: shippingPrice }).total, [subtotal, couponPercent, shippingPrice])
+  const base = roundMoney(payable - shippingPrice)
+  const splitOn = v.payment === 'split'
+  const share = splitOn ? clampShare(payable, v.splitShare || roundMoney(payable / 2)) : 0
+  const plan = splitOn ? planSplit({ base, payable, mode: v.splitMode, share }) : null
+  const totals = useMemo(() => computeTotals({ subtotal, couponPercent, payment: v.payment, shipping: shippingPrice, pixShare: plan && v.splitMode === 'pix_card' ? plan.parts[0].share : 0 }), [subtotal, couponPercent, v.payment, shippingPrice, plan, v.splitMode])
+  const cardBase = payable
   const brand = detectBrand(v.cardNumber ?? '')
+  const brand2 = detectBrand(v.card2Number ?? '')
+  const canSplit = payable >= 20
 
   const applyCoupon = (code: string) => {
     setCoupon({ status: 'checking' })
@@ -147,7 +160,16 @@ export function CheckoutPage() {
         address: { cep: onlyDigits(values.cep), street: values.street, number: values.number, complement: values.complement, neighborhood: values.neighborhood, city: values.city, uf: values.uf, reference: values.reference },
         shippingMethod: values.shippingMethod,
         // Somente método, parcelas e bandeira: número, validade e CVV nunca saem do formulário.
-        payment: { method: values.payment, installments: values.payment === 'card' ? values.installments : undefined, cardBrand: values.payment === 'card' ? brandLabel[brand] : undefined },
+        payment:
+          values.payment === 'split' && plan
+            ? {
+                method: 'split',
+                // Parte 1 = Pix (ou cartão 1); parte 2 = cartão (ou cartão 2). Só método, fatia, parcelas e bandeira.
+                split: values.splitMode === 'pix_card'
+                  ? [{ method: 'pix', share: plan.parts[0].share }, { method: 'card', share: plan.parts[1].share, installments: values.installments, cardBrand: brandLabel[brand] }]
+                  : [{ method: 'card', share: plan.parts[0].share, installments: values.installments, cardBrand: brandLabel[brand] }, { method: 'card', share: plan.parts[1].share, installments: values.installments2, cardBrand: brandLabel[brand2] }],
+              }
+            : { method: values.payment, installments: values.payment === 'card' ? values.installments : undefined, cardBrand: values.payment === 'card' ? brandLabel[brand] : undefined },
         items: lines.map((l) => ({ variantId: l.variant.id, slug: l.product.slug, name: l.product.name, variantLabel: l.variant.label, image: l.image, qty: l.qty, unitPrice: l.variant.price })),
         coupon: coupon.status === 'valid' ? coupon.code : null,
       })
@@ -158,6 +180,41 @@ export function CheckoutPage() {
       setSubmitting(false)
     }
   }, onInvalid)
+
+  // Demonstração: dados aleatórios (porém válidos) para ver confirmação, QR Code etc. sem digitar nada.
+  const fillRandom = async (andSubmit = false) => {
+    const c = randomCustomer()
+    const opts = { shouldValidate: true, shouldTouch: true, shouldDirty: true } as const
+    setValue('email', c.email, opts)
+    setValue('phone', maskPhone(c.phone), opts)
+    setValue('firstName', c.firstName, opts)
+    setValue('lastName', c.lastName, opts)
+    setValue('cpf', maskCPF(c.cpf), opts)
+    setValue('number', c.number, opts)
+    setValue('complement', c.complement)
+    setValue('reference', c.reference)
+    const a = c.cardA, b = c.cardB
+    setValue('cardNumber', a.number); setValue('cardName', a.name); setValue('cardExpiry', a.expiry); setValue('cardCvv', a.cvv)
+    setValue('card2Number', b.number); setValue('card2Name', b.name); setValue('card2Expiry', b.expiry); setValue('card2Cvv', b.cvv)
+    lastCep.current = c.cep // evita a consulta duplicada pelo efeito do CEP
+    setValue('cep', c.cep, opts)
+    const found = await fillFromCep(c.cep, false)
+    if (!found) {
+      const d = c.address
+      setCepState('idle')
+      setValue('street', d.street, opts); setValue('neighborhood', d.neighborhood, opts); setValue('city', d.city, opts); setValue('uf', d.uf, opts)
+      setLocation({ city: d.city, uf: d.uf, cep: d.cep, source: 'demo' })
+    }
+    void trigger()
+    // Dá tempo da cotação de frete do novo endereço terminar antes de finalizar sozinho.
+    if (andSubmit) setTimeout(() => setPendingSubmit(true), 800)
+  }
+  const submitRef = useRef(submit)
+  submitRef.current = submit
+  useEffect(() => {
+    // Espera a cotação de frete do novo endereço antes de finalizar automaticamente.
+    if (pendingSubmit && selected && shipping.status === 'ready' && !submitting) { setPendingSubmit(false); void submitRef.current() }
+  }, [pendingSubmit, selected, shipping.status, submitting])
 
   if (ready && count === 0 && !submitting) {
     return (
@@ -172,7 +229,8 @@ export function CheckoutPage() {
   }
 
   const shippingLabel = selected ? (selected.free ? <span className="text-success">Grátis</span> : <AnimatedNumber value={selected.price} />) : <span className="text-muted">Calculando…</span>
-  const summaryProps = { lines, totals, shippingLabel, payment: v.payment, coupon, onApply: applyCoupon, onRemove: () => setCoupon({ status: 'idle' }) }
+  const splitParts = plan ? plan.parts.map((p, i) => ({ label: v.splitMode === 'pix_card' ? (i === 0 ? 'Pix' : 'Cartão') : `Cartão ${i + 1}`, amount: p.charge })) : undefined
+  const summaryProps = { lines, totals, shippingLabel, payment: v.payment, splitParts, coupon, onApply: applyCoupon, onRemove: () => setCoupon({ status: 'idle' }) }
   const card = v.payment === 'card'
 
   return (
@@ -187,6 +245,14 @@ export function CheckoutPage() {
       </div>
 
       <form onSubmit={submit} noValidate aria-label="Finalizar compra" className="pb-32 lg:pb-10" data-testid="checkout-form">
+        <div className="border-b border-hairline bg-tint px-4 py-4 lg:px-10" data-testid="demo-fill">
+          <p className="t-caps text-brand">Demonstração</p>
+          <p className="t-mono mt-1">Gera nome, CPF válido, CEP real e cartões de teste para você ver a confirmação do pedido e o QR Code sem digitar nada.</p>
+          <div className="mt-3 flex flex-col gap-2 sm:flex-row">
+            <Button variant="outline" onClick={() => void fillRandom(false)} data-testid="fill-random">Preencher com dados aleatórios</Button>
+            <Button onClick={() => void fillRandom(true)} disabled={submitting} data-testid="fill-and-submit">Preencher e finalizar</Button>
+          </div>
+        </div>
         <Section n={1} title="Contato">
           <div className="space-y-3">
             <Field label="E-mail" type="email" autoComplete="email" inputMode="email" valid={ok('email')} error={errors.email?.message} {...register('email')} />
@@ -263,25 +329,27 @@ export function CheckoutPage() {
             <RadioCard name="payment" value="card" checked={card} onChange={() => setValue('payment', 'card')} title="Cartão de crédito" meta="Até 6x sem juros (parcela mínima de R$ 35)">
               <AnimatePresence initial={false}>
                 {card && (
-                  <motion.div initial={{ height: 0, opacity: 0 }} animate={{ height: 'auto', opacity: 1 }} exit={{ height: 0, opacity: 0 }} transition={{ duration: 0.35, ease: [0.22, 1, 0.36, 1] }} className="overflow-hidden">
+                  <motion.div initial={{ height: 0, opacity: 0 }} animate={{ height: 'auto', opacity: 1 }} exit={{ height: 0, opacity: 0 }} transition={{ duration: 0.45, ease: [0.32, 0.72, 0, 1] }} className="overflow-hidden">
                     <div className="space-y-3 border-t border-hairline p-4">
-                      <CardPreview number={v.cardNumber ?? ''} name={v.cardName ?? ''} expiry={v.cardExpiry ?? ''} cvv={v.cardCvv ?? ''} brand={brand} flipped={flip} />
-                      <Field label="Número do cartão" autoComplete="cc-number" inputMode="numeric" error={errors.cardNumber?.message} suffix={brand !== 'unknown' ? <span className="font-mono text-[11px] uppercase">{brandLabel[brand]}</span> : undefined} {...mask('cardNumber', maskCardNumber)} />
-                      <Field label="Nome impresso no cartão" autoComplete="cc-name" error={errors.cardName?.message} {...register('cardName')} />
-                      <div className="grid grid-cols-2 gap-3">
-                        <Field label="Validade (MM/AA)" autoComplete="cc-exp" inputMode="numeric" maxLength={5} error={errors.cardExpiry?.message} {...mask('cardExpiry', maskExpiry)} />
-                        <Field label="CVV" autoComplete="cc-csc" inputMode="numeric" maxLength={cvvLength(brand)} error={errors.cardCvv?.message} {...(() => { const r = register('cardCvv'); return { ...r, onFocus: () => setFlip(true), onBlur: (e: React.FocusEvent<HTMLInputElement>) => { setFlip(false); return r.onBlur(e) } } })()} />
-                      </div>
-                      <SelectField label="Parcelas" {...register('installments', { valueAsNumber: true })}>
-                        {installmentOptions(cardBase).map((o) => <option key={o.count} value={o.count}>{o.count}x de {formatBRL(o.value)} sem juros</option>)}
-                      </SelectField>
-                      {demo && <button type="button" className="t-mono underline" onClick={() => { setValue('cardNumber', '4242 4242 4242 4242'); setValue('cardName', 'MARIA TESTE'); setValue('cardExpiry', '12/30'); setValue('cardCvv', '123'); void trigger(['cardNumber', 'cardName', 'cardExpiry', 'cardCvv']) }}>Preencher cartão de teste</button>}
+                      <CardFields slot="a" form={form} amount={cardBase} flipped={flip} onFlip={setFlip} />
                       <p className="t-mono">Demonstração: os dados do cartão não saem deste formulário.</p>
                     </div>
                   </motion.div>
                 )}
               </AnimatePresence>
             </RadioCard>
+
+            {canSplit && (
+              <RadioCard name="payment" value="split" checked={splitOn} onChange={() => setValue('payment', 'split')} title="Pagar em duas formas" meta="Pix + cartão, ou dividir em dois cartões" right={<span className="border border-brand px-1.5 py-0.5 font-mono text-[11px] uppercase text-brand">Combinado</span>}>
+                <AnimatePresence initial={false}>
+                  {splitOn && (
+                    <motion.div initial={{ height: 0, opacity: 0 }} animate={{ height: 'auto', opacity: 1 }} exit={{ height: 0, opacity: 0 }} transition={{ duration: 0.45, ease: [0.32, 0.72, 0, 1] }} className="overflow-hidden">
+                      <SplitPayment form={form} payable={payable} base={base} />
+                    </motion.div>
+                  )}
+                </AnimatePresence>
+              </RadioCard>
+            )}
 
             {features.boleto && <RadioCard name="payment" value="boleto" checked={v.payment === 'boleto'} onChange={() => setValue('payment', 'boleto')} title="Boleto bancário" meta="Vence em 3 dias · aprovação em até 2 dias úteis" />}
           </div>

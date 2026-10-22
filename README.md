@@ -13,6 +13,10 @@ Protótipo navegável da loja KORRES Brasil com o **design system do korres.com*
 - **Microanimações e transições de tela** (Motion + View Transitions API + CSS, curva estilo iOS) que respeitam `prefers-reduced-motion`.
 - **Mobile alinhado às diretrizes da Apple (HIG):** alvos de toque ≥ 44 pt, campos de 16 px (sem zoom do iOS), áreas seguras do iPhone, folhas inferiores com arraste para fechar e swipe nos drawers.
 - **Quantidade junto ao "Adicionar"** nos cards, no drawer da sacola e na barra fixa da PDP.
+- **Venda híbrida:** no checkout, "Pagar em duas formas" divide o pedido em **Pix + cartão** ou em **dois cartões** (valor livre, mínimo R$ 10 por parte, atalhos 25/50/75%). A confirmação mostra o status de cada parte e o QR do Pix.
+- **Preencher com dados aleatórios:** no topo do checkout, "Preencher com dados aleatórios" (CPF válido, endereço real, cartões de teste) e "Preencher e finalizar" levam direto à confirmação com o QR Code.
+- **Concierge no WhatsApp:** botão flutuante que abre um cartão de concierge e continua a conversa no `wa.me` com contexto (página, itens da sacola, cidade).
+- **Assinatura:** *tdzain — Crafting. Building. Tailor-made.* (link para tdzain.com) no rodapé, no checkout e na confirmação.
 
 ## Como rodar
 
@@ -53,6 +57,7 @@ e2e/ tests/          Playwright e Vitest
 | `NEXT_PUBLIC_FREE_SHIPPING_THRESHOLD` | `299` | Limite de frete grátis (Econômica); a barra do carrinho usa o mesmo valor |
 | `NEXT_PUBLIC_FEATURE_POINTS` | `false` | Programa de pontos "Círculo Korres" |
 | `NEXT_PUBLIC_FEATURE_BOLETO` | `true` | Boleto no checkout |
+| `NEXT_PUBLIC_WHATSAPP_NUMBER` | vazio | Número do concierge (DDI+DDD+número, só dígitos). Vazio: o WhatsApp abre para escolher o contato |
 | `NEXT_PUBLIC_SITE_URL` | `https://korres-brasil.pages.dev` | URL base de metadados |
 
 Origem do frete, matriz por UF, corte (14h) e CD ficam em `config/shipping.ts`.

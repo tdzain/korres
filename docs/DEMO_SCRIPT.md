@@ -9,5 +9,7 @@ Abra **https://korres-brasil.pages.dev/?demo=1** (painel de demonstração no ca
 5. **Sacola (3:15–3:45)** *Adicionar à sacola*: a miniatura voa até a sacola, o contador faz bump e o drawer abre. Barra de frete grátis, "Complete a rotina", estimativa de entrega.
 6. **Checkout (3:45–4:40)** *Prosseguir com sua compra*: uma página só. aparece só o CEP; ao digitar **80010-000** (ou com a cidade do painel demo) rua, bairro e cidade preenchem sozinhos e o foco vai para "Número". CPF de teste **529.982.247-25**. Cupom **BEMVINDO15**. Mostre as opções de envio recalculando e, em *Cartão*, o cartão que vira no CVV (teste: 4242 4242 4242 4242).
 7. **Pix e confirmação (4:40–5:00)** Pix (5% off) → *Finalizar pedido* → QR Code, copia e cola, anel de 30 min → **Simular pagamento aprovado**: "Aguardando" vira "Pagamento aprovado".
+8. **Venda híbrida (bônus)** No checkout clique em **Preencher com dados aleatórios**, escolha **Pagar em duas formas**: em *Pix + Cartão* ajuste o valor do Pix (chips 25/50/75%); em *Dois cartões* cada um tem suas parcelas. **Finalizar** mostra o status de cada parte e, no caso do Pix, o QR Code. **Preencher e finalizar** faz tudo em um clique.
+9. **Concierge (bônus)** O botão verde do WhatsApp (canto inferior direito) abre o concierge; escolha uma intenção e *Conversar no WhatsApp* abre o `wa.me` com a mensagem pronta (página, sacola e cidade).
 
 Dica: *Resetar sessão* no painel limpa carrinho, pedidos e preferências.

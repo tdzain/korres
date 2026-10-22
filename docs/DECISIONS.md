@@ -33,3 +33,11 @@
 | Coluna de informações da PDP | Só fica `sticky` quando cabe na janela; senão rola com a página. Acordeões de abertura múltipla | Nada de texto cortado/escondido |
 | Checkout: entrega | Só o CEP aparece primeiro; ao consultar (ou falhar), os demais campos entram já preenchidos | Menos campos assustadores, principalmente no mobile |
 | CTA do drawer | "Prosseguir com sua compra" | Pedido do cliente |
+| Venda híbrida: base | Cada parte é uma fatia (`share`) do valor a pagar (produtos − cupom + frete, antes do desconto Pix). A 2ª parte é sempre o restante | Soma exata, sem centavos soltos |
+| Venda híbrida: Pix | O desconto de 5% incide só sobre produtos e só sobre a fatia paga no Pix (`5% × min(parte Pix, base)`) | Frete não tem desconto; coerente com o Pix integral |
+| Venda híbrida: limites | Mínimo de R$ 10 por parte; "Pagar em duas formas" só aparece a partir de R$ 20; os dois cartões precisam ser diferentes | Evita parcelas irrelevantes e a mesma forma de pagamento duplicada |
+| Venda híbrida: status | Pix + cartão: cartão aprovado e Pix aguardando (pedido fica "aguardando"); dois cartões: pago na hora | Reflete o que um gateway real devolveria |
+| Dados aleatórios | CPF com dígitos verificadores válidos, 8 CEPs reais com endereço de reserva, cartões de teste; o cartão B nunca repete o A | Demonstração sem digitar nada, sem dado pessoal real |
+| Concierge WhatsApp | FAB só depois da decisão de cookies; abre cartão com intenções e envia `wa.me` com contexto. Sem número configurado, `wa.me/?text=` deixa escolher o contato | Demonstração sem expor um número real |
+| Assinatura | `config/brand.ts` (`maker`) alimenta o componente `MadeBy` e os metadados `authors`/`creator` | Um único ponto de edição |
+| Grids no mobile | `grid` sem coluna base ganha `grid-cols-[minmax(0,1fr)]` | A trilha implícita `auto` crescia até o conteúdo (603 px) e causava rolagem horizontal no iPhone |

@@ -51,7 +51,7 @@ export function CouponBox({ coupon, onApply, onRemove, idPrefix = 'main' }: { co
   )
 }
 
-export function SummaryBody({ lines, totals, shippingLabel, payment, coupon, onApply, onRemove, idPrefix }: { idPrefix?: string; lines: CartLine[]; totals: OrderTotals; shippingLabel: React.ReactNode; payment: 'pix' | 'card' | 'boleto'; coupon: CouponState; onApply: (c: string) => void; onRemove: () => void }) {
+export function SummaryBody({ lines, totals, shippingLabel, payment, coupon, onApply, onRemove, idPrefix, splitParts }: { splitParts?: { label: string; amount: number }[]; idPrefix?: string; lines: CartLine[]; totals: OrderTotals; shippingLabel: React.ReactNode; payment: 'pix' | 'card' | 'boleto' | 'split'; coupon: CouponState; onApply: (c: string) => void; onRemove: () => void }) {
   const inst = bestInstallment(totals.total)
   return (
     <div className="space-y-5">
@@ -80,7 +80,12 @@ export function SummaryBody({ lines, totals, shippingLabel, payment, coupon, onA
           <dd className="text-[24px] font-normal tabular-nums" data-testid="order-total"><AnimatedNumber value={totals.total} /></dd>
         </div>
       </dl>
-      {payment !== 'pix' && inst.count > 1 && <p className="t-mono -mt-3 text-right">ou {inst.count}x de {formatBRL(inst.value)} sem juros</p>}
+      {payment === 'split' && splitParts && (
+        <ul className="-mt-3 space-y-1 border border-hairline bg-white p-3 text-[13px] text-body" aria-label="Como você vai pagar" data-testid="summary-split">
+          {splitParts.map((p, i) => <li key={i} className="flex justify-between gap-3"><span>{p.label}</span><span className="tabular-nums text-brand">{formatBRL(p.amount)}</span></li>)}
+        </ul>
+      )}
+      {payment !== 'pix' && payment !== 'split' && inst.count > 1 && <p className="t-mono -mt-3 text-right">ou {inst.count}x de {formatBRL(inst.value)} sem juros</p>}
       {payment === 'pix' && <p className="t-mono -mt-3 text-right">Valor com 5% de desconto no Pix</p>}
       <ul className="grid gap-2 border-t border-hairline pt-4 text-[12.5px] font-normal text-body">
         <li className="flex items-center gap-2"><LockIcon size={15} className="text-brand" /> Ambiente seguro, dados protegidos</li>

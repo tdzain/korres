@@ -28,7 +28,7 @@ export function SuggestedSection({ products }: { products: ProductSummary[] }) {
 export function CollectionBlock({ title, href, image, imageAlt, products, position = 'center' }: { title: string; href: string; image: string; imageAlt: string; products: ProductSummary[]; position?: string }) {
   return (
     <section className="mt-16 border-y border-hairline lg:mt-20" aria-label={title}>
-      <div className="grid lg:grid-cols-2">
+      <div className="grid grid-cols-[minmax(0,1fr)] lg:grid-cols-2">
         <div className="relative aspect-[4/4.3] overflow-hidden border-hairline bg-surface lg:aspect-auto lg:min-h-[640px] lg:border-r">
           <Reveal className="absolute inset-0"><img src={image} alt={imageAlt} loading="lazy" decoding="async" width={1100} height={1100} className="h-full w-full object-cover" style={{ objectPosition: position }} /></Reveal>
           <div className="absolute inset-x-0 top-0 flex items-center justify-between px-4 py-3 text-brand">
