@@ -15,6 +15,8 @@ export function watchConsole(page: Page) {
 
 /** Respostas determinísticas para serviços externos. */
 export async function mockExternal(page: Page, { prefs = true }: { prefs?: boolean } = {}) {
+  // CEPs aleatórios da demonstração: resposta genérica e determinística (os específicos abaixo têm prioridade).
+  await page.route('**/api/cep/*', (r) => r.fulfill({ json: { cep: '01310-100', street: 'Avenida Paulista', neighborhood: 'Bela Vista', city: 'São Paulo', uf: 'SP' } }))
   // Cookies decididos e newsletter dispensada: o pop-up de 9 s não interfere nos cliques.
   if (prefs) await page.addInitScript(() => { try { if (!localStorage.getItem('kr_prefs')) localStorage.setItem('kr_prefs', JSON.stringify({ state: { cookies: 'all', newsletter: 'dismissed', announcementClosed: false, recentSearches: [] }, version: 0 })) } catch { /* ignore */ } })
   await page.route('**/api/cep/80010000', (r) => r.fulfill({ json: { cep: '80010-000', street: 'Rua José Loureiro', neighborhood: 'Centro', city: 'Curitiba', uf: 'PR' } }))
@@ -25,4 +27,12 @@ export async function mockExternal(page: Page, { prefs = true }: { prefs?: boole
 export async function acceptCookies(page: Page) {
   const accept = page.getByRole('button', { name: 'Aceitar', exact: true })
   if (await accept.isVisible().catch(() => false)) await accept.click()
+}
+
+/** Coloca um item na sacola e abre o checkout. */
+export async function goToCheckoutWithItem(page: Page, slug = 'creme-hidratante-deo-para-maos-oliva-e-bergamota') {
+  await page.goto(`/produto/${slug}/`)
+  await page.getByTestId('add-to-bag').click()
+  await page.getByRole('dialog', { name: 'Sacola de compras' }).getByTestId('cart-line').waitFor()
+  await page.goto('/checkout/')
 }

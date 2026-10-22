@@ -50,7 +50,7 @@ export function AccountView() {
   const orders = useOrders((s) => s.orders)
   if (!user) return <AuthForms />
   return (
-    <div className="grid lg:grid-cols-[1fr_2fr]">
+    <div className="grid grid-cols-[minmax(0,1fr)] lg:grid-cols-[1fr_2fr]">
       <div className="border-hairline px-4 py-10 lg:border-r lg:py-14">
         <p className="font-hand text-[48px] leading-none text-brand">Olá, {user.name.split(' ')[0]}</p>
         <p className="t-mono mt-3">{user.email}</p>

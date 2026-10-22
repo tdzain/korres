@@ -90,7 +90,7 @@ function PixPanel({ order }: { order: Order }) {
   return (
     <section aria-label="Pagamento via Pix" className="border border-hairline" data-testid="pix-panel">
       <div className="flex items-center justify-between border-b border-hairline px-4 py-3">
-        <h2 className="flex items-center gap-2 text-[16px] font-medium text-brand"><PixIcon size={18} /> Pagamento via Pix</h2>
+        <h2 className="flex items-center gap-2 text-[16px] font-medium text-brand"><PixIcon size={18} /> Pagamento via Pix <span className="font-mono text-[13px] font-normal text-muted" data-testid="pix-amount">· {formatBRL(order.pix!.amount ?? order.totals.total)}</span></h2>
         <AnimatePresence mode="wait" initial={false}>
           <motion.p key={paid ? 'paid' : 'wait'} initial={{ opacity: 0, y: 6 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -6 }} className={cn('flex items-center gap-2 text-[13px] font-medium', paid ? 'text-success' : 'text-brand')} role="status" data-testid="pix-status">
             {paid ? <><CheckIcon size={15} /> Pagamento aprovado</> : <><span className="anim-pulse size-2 rounded-full bg-brand" aria-hidden /> Aguardando pagamento</>}
@@ -114,6 +114,34 @@ function PixPanel({ order }: { order: Order }) {
           </motion.div>
         )}
       </AnimatePresence>
+    </section>
+  )
+}
+
+/** Pedido com mais de uma forma de pagamento: mostra cada parte e o status dela. */
+function PartsPanel({ order }: { order: Order }) {
+  const paidAll = order.status === 'paid'
+  return (
+    <section aria-label="Formas de pagamento" className="border border-hairline" data-testid="parts-panel">
+      <h2 className="border-b border-hairline px-4 py-3 text-[16px] font-medium text-brand">Pagamento em duas formas</h2>
+      <ul className="divide-y divide-hairline">
+        {order.parts!.map((p, i) => {
+          const done = p.status === 'paid' || paidAll
+          const label = p.method === 'pix' ? 'Pix' : `Cartão${order.parts!.filter((x) => x.method === 'card').length > 1 ? ` ${order.parts!.filter((x) => x.method === 'card').indexOf(p) + 1}` : ''}${p.cardBrand && p.cardBrand !== 'Cartão' ? ` (${p.cardBrand})` : ''}`
+          return (
+            <li key={i} className="flex items-center justify-between gap-3 px-4 py-3 text-[14px]">
+              <div>
+                <p className="font-medium text-brand">{label}</p>
+                <p className="t-mono">{p.method === 'card' ? `${p.installments ?? 1}x sem juros` : 'QR Code abaixo'}</p>
+              </div>
+              <div className="text-right">
+                <p className="tabular-nums text-brand">{formatBRL(p.charge)}</p>
+                <p className={cn('flex items-center justify-end gap-1 text-[12.5px]', done ? 'text-success' : 'text-muted')}>{done ? <><CheckIcon size={12} /> Aprovado</> : <><span className="anim-pulse size-1.5 rounded-full bg-brand" aria-hidden /> Aguardando</>}</p>
+              </div>
+            </li>
+          )
+        })}
+      </ul>
     </section>
   )
 }
@@ -151,7 +179,8 @@ export function OrderConfirmation() {
 
       <div className="mt-10 grid gap-8 lg:grid-cols-[1.25fr_1fr]">
         <div className="space-y-6">
-          {order.payment.method === 'pix' && order.pix && <PixPanel order={order} />}
+          {order.parts && <PartsPanel order={order} />}
+          {order.pix && <PixPanel order={order} />}
           {order.payment.method === 'boleto' && order.boleto && (
             <section className="space-y-4 border border-hairline p-4" aria-label="Boleto"><h2 className="text-[16px] font-medium text-brand">Boleto bancário</h2><CopyField value={order.boleto.line} label="Linha digitável (exemplo)" /><p className="t-mono">Vencimento: {formatShortDate(order.boleto.dueDate)} · documento fictício de demonstração.</p></section>
           )}

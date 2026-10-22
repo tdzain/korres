@@ -3,6 +3,7 @@ import { Hanken_Grotesk, Reenie_Beanie, Roboto_Mono } from 'next/font/google'
 import './globals.css'
 import { Providers } from '@/components/layout/Providers'
 import { DemoPanel } from '@/components/layout/DemoPanel'
+import { WhatsAppConcierge } from '@/components/layout/WhatsAppConcierge'
 import { Toaster } from '@/components/ui/Toaster'
 import { brand } from '@/config/brand'
 
@@ -16,6 +17,8 @@ export const metadata: Metadata = {
   title: { default: `${brand.name} | Cosméticos naturais da Grécia`, template: `%s | ${brand.name}` },
   description: 'Skincare, corpo e banho e fragrâncias KORRES. Nascida e feita na Grécia. Frete e prazo calculados para a sua cidade, Pix com 5% off e até 6x sem juros.',
   icons: { icon: '/favicon.svg' },
+  authors: [{ name: brand.maker.name, url: brand.maker.url }],
+  creator: `${brand.maker.name} · ${brand.maker.tagline}`,
   robots: { index: false, follow: false }, // protótipo de demonstração
 }
 
@@ -29,6 +32,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           {children}
           <Toaster />
           <DemoPanel />
+          <WhatsAppConcierge />
         </Providers>
       </body>
     </html>

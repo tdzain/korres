@@ -76,12 +76,26 @@ export interface OrderItemInput {
   unitPrice: number
 }
 
+/** Pagamento combinado: cada parte cobre uma fatia (`share`) do valor a pagar (produtos − cupom + frete). */
+export interface SplitPartInput { method: 'pix' | 'card'; share: number; installments?: number; cardBrand?: string }
+
+export interface OrderPart {
+  method: 'pix' | 'card'
+  /** Fatia do pedido coberta por esta forma de pagamento. */
+  share: number
+  /** Valor efetivamente cobrado (no Pix, já com o desconto de 5%). */
+  charge: number
+  installments?: number
+  cardBrand?: string
+  status: 'paid' | 'awaiting_payment'
+}
+
 export interface OrderInput {
   contact: { email: string; phone: string; marketing: boolean }
   customer: { firstName: string; lastName: string; cpf: string }
   address: { cep: string; street: string; number: string; complement?: string; neighborhood: string; city: string; uf: string; reference?: string }
   shippingMethod: ShippingMethodId
-  payment: { method: 'pix' | 'card' | 'boleto'; installments?: number; cardBrand?: string }
+  payment: { method: 'pix' | 'card' | 'boleto' | 'split'; installments?: number; cardBrand?: string; split?: SplitPartInput[] }
   items: OrderItemInput[]
   coupon?: string | null
 }
@@ -102,7 +116,9 @@ export interface Order extends OrderInput {
   status: OrderStatus
   totals: OrderTotals
   shipping: ShippingOption
-  pix?: { code: string; expiresAt: string }
+  pix?: { code: string; expiresAt: string; amount?: number }
+  /** Presente em pedidos com mais de uma forma de pagamento. */
+  parts?: OrderPart[]
   boleto?: { line: string; dueDate: string }
 }
 

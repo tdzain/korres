@@ -1,6 +1,7 @@
 import Link from 'next/link'
 import { brand } from '@/config/brand'
 import { FOOTER } from '@/data/menu'
+import { MadeBy } from './MadeBy'
 import { NewsletterBlock } from './Newsletter'
 
 export function Footer() {
@@ -25,6 +26,7 @@ export function Footer() {
         <p className="font-hand text-[40px] leading-none text-brand md:text-[56px]">{brand.tagline}</p>
         <p className="t-mono mt-6">{brand.legalLine}</p>
         <p className="t-mono mt-1">© {new Date().getFullYear()} {brand.name}. Todos os direitos reservados.</p>
+        <div className="mt-6 border-t border-hairline pt-3"><MadeBy /></div>
       </div>
     </footer>
   )
