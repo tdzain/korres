@@ -4,6 +4,7 @@ import { AnnouncementBar } from './AnnouncementBar'
 import { CookieBanner } from './CookieBanner'
 import { Footer } from './Footer'
 import { Header } from './Header'
+import { LiveRoot } from '@/components/live/LiveRoot'
 import { LocationModal } from './LocationModal'
 import { MobileMenu } from './MobileMenu'
 import { NewsletterPopup } from './Newsletter'
@@ -24,6 +25,7 @@ export function StoreShell({ children }: { children: ReactNode }) {
       <SearchOverlay />
       <MobileMenu />
       <LocationModal />
+      <LiveRoot />
     </>
   )
 }

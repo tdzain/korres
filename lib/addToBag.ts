@@ -4,8 +4,8 @@ import { useCart } from '@/lib/store/cart'
 import { useToast } from '@/lib/store/toast'
 
 /** Miniatura "voa" até o ícone da sacola (WAAPI, 60fps, só transform/opacity). */
-export function flyToCart(source: Element | null, src: string) {
-  const target = document.querySelector<HTMLElement>('[data-bag-icon]')
+export function flyToCart(source: Element | null, src: string, targetSelector = '[data-bag-icon]') {
+  const target = document.querySelector<HTMLElement>(targetSelector)
   if (!source || !target || prefersReducedMotion()) return Promise.resolve()
   const from = source.getBoundingClientRect()
   const to = target.getBoundingClientRect()
@@ -39,7 +39,7 @@ export interface BagTarget { slug: string; variantId: string; name: string; imag
  *   ~720 ms  a miniatura chega: o item entra na lista (linha expande) e o contador faz bump
  * Sem origem (ex.: dentro do drawer) ou com movimento reduzido, tudo acontece sem voo.
  */
-export async function addToBag(t: BagTarget, qty = 1, source?: Element | null, { openDrawer = true, silent = false }: { openDrawer?: boolean; silent?: boolean } = {}) {
+export async function addToBag(t: BagTarget, qty = 1, source?: Element | null, { openDrawer = true, silent = false, flyTarget }: { openDrawer?: boolean; silent?: boolean; flyTarget?: string } = {}) {
   const cart = useCart.getState()
   const animate = !!source && !prefersReducedMotion()
   if (!animate) {
@@ -48,7 +48,7 @@ export async function addToBag(t: BagTarget, qty = 1, source?: Element | null, {
     else if (!silent) useToast.getState().push(`${t.name} adicionado à sacola`)
     return
   }
-  const fly = flyToCart(source ?? null, t.image)
+  const fly = flyToCart(source ?? null, t.image, flyTarget)
   if (openDrawer) setTimeout(() => useCart.getState().setOpen(true), 260)
   await fly
   useCart.getState().add({ variantId: t.variantId, slug: t.slug }, qty)

@@ -29,6 +29,12 @@ export const ArrowRightIcon = I(<path d="M4 12h16m-6-6 6 6-6 6" />)
 export const FilterIcon = I(<><path d="M4 7h16M7 12h10M10 17h4" /></>)
 export const ShieldIcon = I(<><path d="M12 3 5 6v5c0 4.500 3 8 7 10 4-2 7-5.500 7-10V6z" /><path d="m9 12 2.200 2.200L15 10" /></>)
 export const LeafIcon = I(<><path d="M5 19c0-8 5-14 15-14 0 10-6 15-14 15" /><path d="M5 19 13 11" /></>)
+export const HeartIcon = I(<path d="M12 20s-7.500-4.600-7.500-10A4.300 4.300 0 0 1 12 7.500 4.300 4.300 0 0 1 19.500 10c0 5.400-7.500 10-7.500 10z" />)
+export const HeartFilledIcon = function HeartFilledIcon({ size, ...p }: P) { return <svg {...base(size)} {...p} fill="currentColor"><path d="M12 20s-7.500-4.600-7.500-10A4.300 4.300 0 0 1 12 7.500 4.300 4.300 0 0 1 19.500 10c0 5.400-7.500 10-7.500 10z" /></svg> }
+export const VolumeIcon = I(<><path d="M4 9.500h3.500L12 6v12l-4.500-3.500H4z" /><path d="M15.500 9a4 4 0 0 1 0 6M18 6.500a7.500 7.500 0 0 1 0 11" /></>)
+export const MuteIcon = I(<><path d="M4 9.500h3.500L12 6v12l-4.500-3.500H4z" /><path d="m16 9.500 5 5m0-5-5 5" /></>)
+export const InfoIcon = I(<><circle cx="12" cy="12" r="9" /><path d="M12 11v5.500M12 7.800v.1" /></>)
+export const SendIcon = I(<path d="M4 12 20 4l-4.500 16-3.500-6.500z" />)
 export const ExpandIcon = I(<path d="M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5" />)
 
 export function StarIcon({ size = 12, ...p }: P) {
