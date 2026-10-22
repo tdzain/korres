@@ -1,0 +1,55 @@
+import { expect, test } from '@playwright/test'
+import { acceptCookies, mockExternal } from './helpers'
+
+test('PLP: filtros em drawer, ordenação e carregar mais', async ({ page }) => {
+  await mockExternal(page)
+  await page.goto('/colecao/corpo/')
+  await acceptCookies(page)
+  const total = await page.getByTestId('product-card').count()
+  expect(total).toBe(12)
+  await page.getByRole('button', { name: 'Carregar mais' }).click()
+  await expect(page.getByTestId('product-card')).toHaveCount(24)
+  await page.getByTestId('open-filters').click()
+  const drawer = page.getByRole('dialog', { name: 'Filtros' })
+  await drawer.getByLabel('Sabonetes em barra').check()
+  await drawer.getByRole('button', { name: /Ver \d+ produtos/ }).click()
+  const filtered = await page.getByTestId('product-card').count()
+  expect(filtered).toBeLessThan(24)
+  await page.getByTestId('sort-button').click()
+  await page.getByRole('option', { name: 'Menor preço' }).click()
+  const firstPrice = await page.getByTestId('product-card').first().textContent()
+  expect(firstPrice).toMatch(/R\$\s16,80/)
+})
+
+test('busca em overlay com sugestões', async ({ page, isMobile }) => {
+  await mockExternal(page)
+  await page.goto('/')
+  await acceptCookies(page)
+  await page.getByRole('button', { name: isMobile ? 'Buscar' : 'Buscar produtos', exact: true }).click()
+  const dlg = page.getByRole('dialog', { name: 'Busca' })
+  await expect(dlg.getByText('Buscas populares')).toBeVisible()
+  await dlg.getByLabel('Buscar', { exact: true }).fill('yoghurt')
+  await expect(dlg.getByRole('link', { name: /Smart Yoghurt/ }).first()).toBeVisible()
+})
+
+test('favoritos e modal de CEP', async ({ page }) => {
+  await mockExternal(page)
+  await page.goto('/produto/smart-yoghurt-probiotic-gel-cream/')
+  await acceptCookies(page)
+  await page.getByRole('button', { name: /Salvar .* nos favoritos/ }).first().click()
+  await page.goto('/favoritos/')
+  await expect(page.getByTestId('product-card')).toHaveCount(1)
+  await page.goto('/produto/smart-yoghurt-probiotic-gel-cream/')
+  await page.getByTestId('confirm-cep').click()
+  const dlg = page.getByRole('dialog', { name: 'Alterar localização de entrega' })
+  await dlg.getByLabel('CEP').fill('69005010')
+  await expect(page.getByTestId('delivery-block')).toContainText('Manaus – AM')
+})
+
+test('404 de marca e institucionais', async ({ page }) => {
+  await page.goto('/p/envio-e-entregas/')
+  await expect(page.getByRole('heading', { level: 1 })).toContainText('Envio e entregas')
+  const res = await page.goto('/pagina-que-nao-existe/')
+  expect(res?.status()).toBe(404)
+  await expect(page.getByText('Página não encontrada')).toBeVisible()
+})

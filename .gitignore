@@ -1,0 +1,11 @@
+node_modules
+.next
+out
+.wrangler
+.env*.local
+playwright-report
+test-results
+*.tsbuildinfo
+next-env.d.ts
+.DS_Store
+data/raw

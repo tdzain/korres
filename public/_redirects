@@ -1,0 +1,3 @@
+# /pedido/KR12345678 → mesma página estática, que lê o id da URL no navegador.
+/pedido/:id    /pedido/    200
+/pedido/:id/   /pedido/    200
