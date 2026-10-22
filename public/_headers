@@ -4,8 +4,11 @@
   Cache-Control: public, max-age=31536000, immutable
 /editorial/*
   Cache-Control: public, max-age=31536000, immutable
-/video/*
+/video/pure-greek-olive.mp4
   Cache-Control: public, max-age=31536000, immutable
+# Lives da Black Friday: podem ser trocadas mantendo o nome, então revalidam (ETag) em vez de ficarem imutáveis.
+/video/live/*
+  Cache-Control: public, max-age=3600, must-revalidate
 /brand/*
   Cache-Control: public, max-age=31536000, immutable
 /*
