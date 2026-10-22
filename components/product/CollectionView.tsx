@@ -91,11 +91,11 @@ export function CollectionView({ collection, products }: { collection: Collectio
 
       {/* Barra: FILTROS | ORDENAR POR (duas metades, como no korres.com) */}
       <div className="relative grid grid-cols-2 border-y border-hairline bg-surface" data-testid="plp-bar">
-        <button type="button" onClick={() => setFilterOpen(true)} className="flex h-9 items-center justify-between px-4 text-[14px] font-normal uppercase text-brand" aria-haspopup="dialog" data-testid="open-filters">
+        <button type="button" onClick={() => setFilterOpen(true)} className="flex h-12 items-center justify-between px-4 text-[14px] font-normal uppercase text-brand md:h-9" aria-haspopup="dialog" data-testid="open-filters">
           <span className="flex items-center gap-2"><FilterIcon size={15} /> Filtros{activeChips.length > 0 && <span className="font-mono text-[12px]">({activeChips.length})</span>}</span><PlusIcon size={14} />
         </button>
         <div className="relative border-l border-hairline">
-          <button type="button" onClick={() => setSortOpen((o) => !o)} aria-expanded={sortOpen} aria-haspopup="listbox" className="flex h-9 w-full items-center justify-between px-4 text-[14px] font-normal uppercase text-brand" data-testid="sort-button">
+          <button type="button" onClick={() => setSortOpen((o) => !o)} aria-expanded={sortOpen} aria-haspopup="listbox" className="flex h-12 w-full items-center justify-between px-4 text-[14px] font-normal uppercase text-brand md:h-9" data-testid="sort-button">
             <span>Ordenar por: <span className="normal-case">{SORTS.find((s) => s.id === sort)!.label}</span></span><PlusIcon size={14} className={cn('transition-transform duration-300', sortOpen && 'rotate-45')} />
           </button>
           <AnimatePresence>
@@ -103,7 +103,7 @@ export function CollectionView({ collection, products }: { collection: Collectio
               <motion.ul role="listbox" aria-label="Ordenar" initial={{ opacity: 0, y: -6 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -6 }} transition={{ duration: 0.22 }} className="absolute inset-x-0 top-full z-20 border-x border-b border-hairline bg-white">
                 {SORTS.map((s) => (
                   <li key={s.id} role="option" aria-selected={s.id === sort}>
-                    <button type="button" onClick={() => { setSort(s.id); setSortOpen(false); setVisible(PAGE) }} className={cn('w-full px-4 py-2.5 text-left text-[14px] font-normal hover:bg-tint', s.id === sort ? 'text-brand' : 'text-body')}>{s.label}</button>
+                    <button type="button" onClick={() => { setSort(s.id); setSortOpen(false); setVisible(PAGE) }} className={cn('min-h-11 w-full px-4 py-2.5 text-left text-[14px] font-normal hover:bg-tint', s.id === sort ? 'text-brand' : 'text-body')}>{s.label}</button>
                   </li>
                 ))}
               </motion.ul>

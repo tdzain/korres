@@ -10,7 +10,9 @@ Protótipo navegável da loja KORRES Brasil com o **design system do korres.com*
 - **PDP com entrega inteligente** (estilo Mercado Livre): prazo e frete da cidade detectada, sem pedir CEP, com contagem regressiva até o corte das 14h.
 - **Geolocalização em cascata:** escolha salva → borda do Cloudflare (`request.cf`) → ipwho.is → São Paulo; opcionalmente GPS (com consentimento, nunca persiste coordenadas) e CEP (ViaCEP/BrasilAPI).
 - **Busca, favoritos, conta simulada, institucionais e 404 de marca.** Programa de pontos atrás de flag desligada.
-- **Microanimações** (Motion + CSS) que respeitam `prefers-reduced-motion`.
+- **Microanimações e transições de tela** (Motion + View Transitions API + CSS, curva estilo iOS) que respeitam `prefers-reduced-motion`.
+- **Mobile alinhado às diretrizes da Apple (HIG):** alvos de toque ≥ 44 pt, campos de 16 px (sem zoom do iOS), áreas seguras do iPhone, folhas inferiores com arraste para fechar e swipe nos drawers.
+- **Quantidade junto ao "Adicionar"** nos cards, no drawer da sacola e na barra fixa da PDP.
 
 ## Como rodar
 

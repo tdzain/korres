@@ -26,3 +26,10 @@
 | SEO | `noindex` | Protótipo de demonstração |
 | Conta Cloudflare | Publicado na conta `datacenter@tdzain.com.br` (a do domínio tdzain), projeto `korres-brasil` | Havia duas contas no login; escolhida a do usuário |
 | Lighthouse | Perf PDP 93, PLP 88, home ~75 (mobile, 4x CPU); A11y 99–100; Boas práticas 100 | Home limitada pelo custo de hidratação; ver FIDELITY_REPORT |
+| Transições de tela | View Transitions API via `<ViewTransition>` (React experimental do Next, `experimental.viewTransition`) com crossfade + deslize de 10 px | Suavidade nativa sem biblioteca; desativada com `prefers-reduced-motion` |
+| Curva de movimento | `cubic-bezier(.32,.72,0,1)` (iOS) em drawers, folhas, acordeões e quantidade; sem springs com overshoot | Movimento previsível e suave |
+| Sacola: coreografia | voo da miniatura (0–720 ms) → drawer abre aos 260 ms → item entra na lista quando a miniatura chega; filhos do drawer entram em cascata | Evita saltos de layout |
+| Quantidade nos cards | "Adicionar" vira `− N +` no lugar, sem abrir o drawer | Varejo brasileiro: ajustar quantidade rápido |
+| Coluna de informações da PDP | Só fica `sticky` quando cabe na janela; senão rola com a página. Acordeões de abertura múltipla | Nada de texto cortado/escondido |
+| Checkout: entrega | Só o CEP aparece primeiro; ao consultar (ou falhar), os demais campos entram já preenchidos | Menos campos assustadores, principalmente no mobile |
+| CTA do drawer | "Prosseguir com sua compra" | Pedido do cliente |

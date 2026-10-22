@@ -32,14 +32,24 @@ export function flyToCart(source: Element | null, src: string) {
 
 export interface BagTarget { slug: string; variantId: string; name: string; image: string }
 
-/** Adiciona à sacola, anima a miniatura até o ícone e abre o drawer com spring. */
-export async function addToBag(t: BagTarget, qty = 1, source?: Element | null, { openDrawer = true }: { openDrawer?: boolean } = {}) {
+/**
+ * Adicionar à sacola, em sequência coreografada:
+ *   0 ms     a miniatura começa a voar até o ícone da sacola
+ *   ~260 ms  o drawer começa a abrir (a miniatura continua visível por cima)
+ *   ~720 ms  a miniatura chega: o item entra na lista (linha expande) e o contador faz bump
+ * Sem origem (ex.: dentro do drawer) ou com movimento reduzido, tudo acontece sem voo.
+ */
+export async function addToBag(t: BagTarget, qty = 1, source?: Element | null, { openDrawer = true, silent = false }: { openDrawer?: boolean; silent?: boolean } = {}) {
   const cart = useCart.getState()
+  const animate = !!source && !prefersReducedMotion()
+  if (!animate) {
+    cart.add({ variantId: t.variantId, slug: t.slug }, qty)
+    if (openDrawer) cart.setOpen(true)
+    else if (!silent) useToast.getState().push(`${t.name} adicionado à sacola`)
+    return
+  }
   const fly = flyToCart(source ?? null, t.image)
-  // Atualiza o contador quando a miniatura chega.
-  const delay = prefersReducedMotion() || !source ? 0 : 560
-  setTimeout(() => cart.add({ variantId: t.variantId, slug: t.slug }, qty), delay)
+  if (openDrawer) setTimeout(() => useCart.getState().setOpen(true), 260)
   await fly
-  if (openDrawer) useCart.getState().setOpen(true)
-  else useToast.getState().push(`${t.name} adicionado à sacola`)
+  useCart.getState().add({ variantId: t.variantId, slug: t.slug }, qty)
 }

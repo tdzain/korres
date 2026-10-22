@@ -14,7 +14,6 @@ import { MAX_QTY, useCart } from '@/lib/store/cart'
 import { FavoriteButton } from './FavoriteButton'
 import { DeliveryBlock } from './DeliveryBlock'
 import { ProductGallery } from './ProductGallery'
-import { ProductImage } from './ProductImage'
 import { cn } from '@/lib/cn'
 
 const sec = (p: Product, key: ProductSection['key']) => p.sections.filter((s) => s.key === key)
@@ -76,8 +75,11 @@ export function ProductInfo({ product: p, categoryLabel }: { product: Product; c
   const variant = p.variants.find((v) => v.id === variantId)!
   const total = roundMoney(variant.price * qty)
   const off = discountPercent(variant.listPrice, variant.price)
-  const inst = bestInstallment(total)
   const ctaRef = useRef<HTMLDivElement>(null)
+  const colRef = useRef<HTMLDivElement>(null)
+  // A coluna de informações só fica "grudada" quando cabe na tela. Se estiver mais alta que a janela
+  // (acordeões abertos), ela rola junto com a página e nenhum conteúdo fica cortado ou escondido.
+  const [sticky, setSticky] = useState(true)
   const [ctaVisible, setCtaVisible] = useState(true)
   const accordion = useMemo(() => buildAccordion(p), [p])
   const inCart = useCart((s) => s.items.find((i) => i.variantId === variantId)?.qty ?? 0)
@@ -88,6 +90,20 @@ export function ProductInfo({ product: p, categoryLabel }: { product: Product; c
     const m2 = variant.image.replace('m1.webp', 'm2.webp')
     return [variant.image, ...(m2 !== variant.image ? [m2] : []), ...p.images]
   }, [p.images, variant.image])
+
+  useEffect(() => {
+    const el = colRef.current
+    if (!el) return
+    const measure = () => {
+      const top = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--sticky-top')) || 36
+      setSticky(el.scrollHeight <= window.innerHeight - Math.max(top, 36) - 8)
+    }
+    const ro = new ResizeObserver(measure)
+    ro.observe(el)
+    window.addEventListener('resize', measure)
+    measure()
+    return () => { ro.disconnect(); window.removeEventListener('resize', measure) }
+  }, [])
 
   useEffect(() => {
     const el = ctaRef.current
@@ -107,8 +123,8 @@ export function ProductInfo({ product: p, categoryLabel }: { product: Product; c
       <div className="grid border-b border-hairline lg:grid-cols-2">
         <div className="border-hairline lg:border-r"><ProductGallery images={images} name={p.name} /></div>
 
-        <div className="lg:sticky lg:top-[var(--sticky-top)] lg:max-h-[calc(100dvh-var(--sticky-top))] lg:self-start lg:overflow-y-auto lg:transition-[top] lg:duration-300 [scrollbar-width:none]">
-          <div className="space-y-5 px-4 pb-10 pt-4">
+        <div ref={colRef} className={cn('lg:self-start', sticky && 'lg:sticky lg:top-[var(--sticky-top)] lg:transition-[top] lg:duration-300')}>
+          <div className="space-y-6 px-4 pb-10 pt-5">
             <div className="flex items-start justify-between">
               <div className="flex flex-wrap items-center gap-2">
                 {off >= 3 && <Badge>{off}% off</Badge>}
@@ -150,24 +166,24 @@ export function ProductInfo({ product: p, categoryLabel }: { product: Product; c
             <DeliveryBlock subtotal={total} />
 
             <div ref={ctaRef} className="space-y-2">
-              <div className="flex items-stretch gap-2">
+              <div className="flex items-center justify-between gap-3">
+                <p className="t-caps text-brand">Quantidade</p>
                 <Stepper value={qty} min={1} max={MAX_QTY} onChange={setQty} />
-                <div className="flex-1"><Button size="lg" full onClick={(e) => add(e.currentTarget.closest('[data-gallery-main]') ?? undefined)} data-testid="add-to-bag">Adicionar à sacola</Button></div>
               </div>
+              <Button size="lg" full onClick={(e) => add(e.currentTarget.closest('[data-gallery-main]') ?? undefined)} data-testid="add-to-bag">Adicionar à sacola · {formatBRL(total)}</Button>
               <Button variant="outline" size="lg" full onClick={buyNow} data-testid="buy-now">Comprar agora</Button>
               {inCart > 0 && <p className="t-mono">Você já tem {inCart} deste item na sacola.</p>}
             </div>
 
-            <Accordion items={accordion} defaultOpen={accordion[0]?.id} className="border-t border-hairline pt-3" />
+            <Accordion multiple items={accordion} defaultOpen={accordion[0]?.id} className="border-t border-hairline pt-3" />
           </div>
         </div>
       </div>
 
-      {/* Barra fixa inferior no mobile */}
-      <div className={cn('fixed inset-x-0 bottom-0 z-40 flex items-center gap-3 border-t border-hairline bg-white px-4 py-2.5 transition-transform duration-300 ease-[var(--ease-out)] lg:hidden', ctaVisible ? 'translate-y-full' : 'translate-y-0')} aria-hidden={ctaVisible} data-testid="sticky-bar">
-        <div className="size-11 shrink-0 border border-hairline"><ProductImage src={variant.image ?? p.images[0]!} alt="" sizes="44px" /></div>
-        <div className="min-w-0 flex-1"><p className="t-label truncate">{p.name}</p><p className="t-mono">{formatBRL(total)} · {inst.count}x sem juros</p></div>
-        <Button onClick={() => add(document.querySelector('[data-gallery-main] img'))} magnetic={false}>Adicionar</Button>
+      {/* Barra fixa inferior no mobile: quantidade + adicionar, respeitando a área segura do iPhone */}
+      <div className={cn('fixed inset-x-0 bottom-0 z-40 flex items-center gap-2 border-t border-hairline bg-white px-4 pt-2.5 pb-safe transition-transform duration-500 ease-[var(--ease-ios)] lg:hidden', ctaVisible ? 'translate-y-full' : 'translate-y-0')} aria-hidden={ctaVisible} data-testid="sticky-bar">
+        <Stepper value={qty} min={1} max={MAX_QTY} onChange={setQty} label="Quantidade (barra fixa)" />
+        <div className="min-w-0 flex-1"><Button size="lg" full onClick={() => add(document.querySelector('[data-gallery-main] img'))} magnetic={false}>Adicionar · {formatBRL(total)}</Button></div>
       </div>
     </>
   )

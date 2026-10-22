@@ -41,4 +41,4 @@ export const checkoutSchema = z
 export type CheckoutValues = z.infer<typeof checkoutSchema>
 
 /** Ordem visual dos campos: usada para rolar/focar o primeiro erro. */
-export const FIELD_ORDER: (keyof CheckoutValues)[] = ['email', 'phone', 'firstName', 'lastName', 'cpf', 'cep', 'street', 'number', 'neighborhood', 'city', 'uf', 'cardNumber', 'cardName', 'cardExpiry', 'cardCvv']
+export const FIELD_ORDER: (keyof CheckoutValues)[] = ['email', 'phone', 'cep', 'firstName', 'lastName', 'cpf', 'street', 'number', 'neighborhood', 'city', 'uf', 'cardNumber', 'cardName', 'cardExpiry', 'cardCvv']

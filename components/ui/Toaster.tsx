@@ -6,7 +6,7 @@ import { CheckIcon } from './Icons'
 export function Toaster() {
   const items = useToast((s) => s.items)
   return (
-    <div className="pointer-events-none fixed bottom-20 left-1/2 z-[95] flex -translate-x-1/2 flex-col items-center gap-2 md:bottom-6" role="status" aria-live="polite">
+    <div className="pointer-events-none fixed bottom-[calc(88px+env(safe-area-inset-bottom))] left-1/2 z-[95] flex -translate-x-1/2 flex-col items-center gap-2 md:bottom-6" role="status" aria-live="polite">
       <AnimatePresence>
         {items.map((t) => (
           <motion.div key={t.id} initial={{ opacity: 0, y: 14 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: 8 }} transition={{ duration: 0.3, ease: [0.22, 1, 0.36, 1] }} className="pointer-events-auto flex items-center gap-2 bg-brand px-4 py-3 text-[14px] font-normal text-white">

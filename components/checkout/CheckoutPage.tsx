@@ -57,6 +57,8 @@ export function CheckoutPage() {
   const [submitting, setSubmitting] = useState(false)
   const [flip, setFlip] = useState(false)
   const [summaryOpen, setSummaryOpen] = useState(false)
+  // Entrega em duas etapas: só o CEP aparece primeiro; o restante entra (já preenchido) depois da consulta.
+  const [revealed, setRevealed] = useState(false)
   const lastCep = useRef('')
   const typedCep = useRef(false)
 
@@ -86,6 +88,7 @@ export function CheckoutPage() {
   const fillFromCep = useCallback(async (cep: string, focusNumber: boolean) => {
     setCepState('loading')
     const res = await lookupCep(cep)
+    setRevealed(true) // com ou sem resultado: se não achou, a pessoa preenche manualmente
     if (!res) { setCepState('error'); return }
     setCepState('idle')
     setValue('street', res.street, { shouldValidate: true })
@@ -127,9 +130,11 @@ export function CheckoutPage() {
   const onInvalid = (errs: FieldErrors<CheckoutValues>) => {
     const first = FIELD_ORDER.find((k) => errs[k])
     if (!first) return
-    const el = document.querySelector<HTMLElement>(`[name="${first}"]`)
-    el?.scrollIntoView({ behavior: 'smooth', block: 'center' })
-    setTimeout(() => setFocus(first), 350)
+    if (!document.querySelector(`[name="${first}"]`)) setRevealed(true)
+    setTimeout(() => {
+      document.querySelector<HTMLElement>(`[name="${first}"]`)?.scrollIntoView({ behavior: 'smooth', block: 'center' })
+      setTimeout(() => setFocus(first), 300)
+    }, 60)
   }
 
   const submit = handleSubmit(async (values) => {
@@ -174,14 +179,14 @@ export function CheckoutPage() {
     <div className="lg:grid lg:grid-cols-[58fr_42fr]">
       {/* Resumo colapsável (mobile) */}
       <div className="border-b border-hairline bg-tint lg:hidden">
-        <button type="button" onClick={() => setSummaryOpen((o) => !o)} aria-expanded={summaryOpen} className="flex w-full items-center justify-between px-4 py-4 text-[14px] font-normal text-brand" data-testid="summary-toggle">
+        <button type="button" onClick={() => setSummaryOpen((o) => !o)} aria-expanded={summaryOpen} className="flex min-h-14 w-full items-center justify-between px-4 py-3 text-[14px] font-normal text-brand" data-testid="summary-toggle">
           <span>{summaryOpen ? 'Ocultar' : 'Mostrar'} resumo do pedido ({count})</span>
           <AnimatedNumber value={totals.total} className="text-[18px]" />
         </button>
         <AnimatePresence initial={false}>{summaryOpen && <motion.div initial={{ height: 0 }} animate={{ height: 'auto' }} exit={{ height: 0 }} transition={{ duration: 0.35, ease: [0.22, 1, 0.36, 1] }} className="overflow-hidden"><div className="px-4 pb-5"><SummaryBody {...summaryProps} idPrefix="m" /></div></motion.div>}</AnimatePresence>
       </div>
 
-      <form onSubmit={submit} noValidate aria-label="Finalizar compra" className="pb-24 lg:pb-10" data-testid="checkout-form">
+      <form onSubmit={submit} noValidate aria-label="Finalizar compra" className="pb-32 lg:pb-10" data-testid="checkout-form">
         <Section n={1} title="Contato">
           <div className="space-y-3">
             <Field label="E-mail" type="email" autoComplete="email" inputMode="email" valid={ok('email')} error={errors.email?.message} {...register('email')} />
@@ -192,23 +197,37 @@ export function CheckoutPage() {
 
         <Section n={2} title="Entrega">
           <div className="space-y-3">
-            <Field label="CEP" autoComplete="postal-code" inputMode="numeric" maxLength={9} valid={ok('cep') && cepState === 'idle'} error={errors.cep?.message ?? (cepState === 'error' ? 'Não encontramos esse CEP. Preencha o endereço manualmente.' : undefined)} suffix={cepState === 'loading' ? <span className="anim-pulse t-mono">buscando…</span> : undefined} {...(() => { const r = mask('cep', maskCEP); return { ...r, onChange: (e: React.ChangeEvent<HTMLInputElement>) => { typedCep.current = true; return r.onChange(e) } } })()} />
-            <div className="grid gap-3 sm:grid-cols-2">
-              <Field label="Nome" autoComplete="given-name" valid={ok('firstName')} error={errors.firstName?.message} {...register('firstName')} />
-              <Field label="Sobrenome" autoComplete="family-name" valid={ok('lastName')} error={errors.lastName?.message} {...register('lastName')} />
-            </div>
-            <Field label="CPF" inputMode="numeric" autoComplete="off" maxLength={14} valid={ok('cpf')} error={errors.cpf?.message} hint="Necessário para a nota fiscal" {...(() => { const r = register('cpf'); return { ...r, onChange: (e: React.ChangeEvent<HTMLInputElement>) => { e.target.value = maskCPF(e.target.value); return r.onChange(e) } } })()} />
-            <Field label="Rua" autoComplete="address-line1" flash={flash.street} valid={ok('street')} error={errors.street?.message} {...register('street')} />
-            <div className="grid grid-cols-[1fr_2fr] gap-3">
-              <Field label="Número" autoComplete="off" inputMode="numeric" valid={ok('number')} error={errors.number?.message} {...register('number')} />
-              <Field label="Complemento (opcional)" autoComplete="address-line2" {...register('complement')} />
-            </div>
-            <Field label="Bairro" autoComplete="address-level3" flash={flash.neighborhood} valid={ok('neighborhood')} error={errors.neighborhood?.message} {...register('neighborhood')} />
-            <div className="grid grid-cols-[2fr_1fr] gap-3">
-              <Field label="Cidade" autoComplete="address-level2" flash={flash.city} valid={ok('city')} error={errors.city?.message} {...register('city')} />
-              <SelectField label="UF" autoComplete="address-level1" error={errors.uf?.message} {...register('uf')}><option value="" />{UFS.map((u) => <option key={u.uf} value={u.uf}>{u.uf}</option>)}</SelectField>
-            </div>
-            <Field label="Ponto de referência (opcional)" autoComplete="off" {...register('reference')} />
+            <Field label="CEP" autoComplete="postal-code" inputMode="numeric" maxLength={9} valid={ok('cep') && cepState === 'idle'} error={errors.cep?.message ?? (cepState === 'error' ? 'Não encontramos esse CEP. Preencha o endereço manualmente.' : undefined)} hint={revealed ? undefined : 'Digite seu CEP e preenchemos o endereço para você.'} suffix={cepState === 'loading' ? <span className="anim-pulse t-mono">buscando…</span> : undefined} {...(() => { const r = mask('cep', maskCEP); return { ...r, onChange: (e: React.ChangeEvent<HTMLInputElement>) => { typedCep.current = true; return r.onChange(e) } } })()} />
+            {!revealed && (
+              <div className="flex flex-wrap gap-x-5">
+                <a href="https://buscacepinter.correios.com.br/app/endereco/index.php" target="_blank" rel="noopener noreferrer" className="link-static-underline inline-flex min-h-11 items-center text-[14px] font-normal text-brand">Não sei meu CEP</a>
+                <button type="button" onClick={() => { setRevealed(true); setTimeout(() => setFocus('street'), 400) }} className="link-static-underline inline-flex min-h-11 items-center text-[14px] font-normal text-brand">Preencher endereço manualmente</button>
+              </div>
+            )}
+            <AnimatePresence initial={false}>
+              {revealed && (
+                <motion.div key="addr" initial={{ height: 0, opacity: 0 }} animate={{ height: 'auto', opacity: 1 }} exit={{ height: 0, opacity: 0 }} transition={{ duration: 0.5, ease: [0.32, 0.72, 0, 1] }} className="-mx-1 overflow-hidden px-1">
+                  <div className="space-y-3 pb-1 pt-3">
+                    <Field label="Rua" autoComplete="address-line1" flash={flash.street} valid={ok('street')} error={errors.street?.message} {...register('street')} />
+                    <div className="grid grid-cols-[1fr_2fr] gap-3">
+                      <Field label="Número" autoComplete="off" inputMode="numeric" valid={ok('number')} error={errors.number?.message} {...register('number')} />
+                      <Field label="Complemento (opcional)" autoComplete="address-line2" {...register('complement')} />
+                    </div>
+                    <Field label="Bairro" autoComplete="address-level3" flash={flash.neighborhood} valid={ok('neighborhood')} error={errors.neighborhood?.message} {...register('neighborhood')} />
+                    <div className="grid grid-cols-[2fr_1fr] gap-3">
+                      <Field label="Cidade" autoComplete="address-level2" flash={flash.city} valid={ok('city')} error={errors.city?.message} {...register('city')} />
+                      <SelectField label="UF" autoComplete="address-level1" error={errors.uf?.message} {...register('uf')}><option value="" />{UFS.map((u) => <option key={u.uf} value={u.uf}>{u.uf}</option>)}</SelectField>
+                    </div>
+                    <div className="grid gap-3 sm:grid-cols-2">
+                      <Field label="Nome" autoComplete="given-name" valid={ok('firstName')} error={errors.firstName?.message} {...register('firstName')} />
+                      <Field label="Sobrenome" autoComplete="family-name" valid={ok('lastName')} error={errors.lastName?.message} {...register('lastName')} />
+                    </div>
+                    <Field label="CPF" inputMode="numeric" autoComplete="off" maxLength={14} valid={ok('cpf')} error={errors.cpf?.message} hint="Necessário para a nota fiscal" {...(() => { const r = register('cpf'); return { ...r, onChange: (e: React.ChangeEvent<HTMLInputElement>) => { e.target.value = maskCPF(e.target.value); return r.onChange(e) } } })()} />
+                    <Field label="Ponto de referência (opcional)" autoComplete="off" {...register('reference')} />
+                  </div>
+                </motion.div>
+              )}
+            </AnimatePresence>
           </div>
         </Section>
 
@@ -279,7 +298,7 @@ export function CheckoutPage() {
       </aside>
 
       {/* Botão fixo no rodapé (mobile) */}
-      <div className="fixed inset-x-0 bottom-0 z-40 border-t border-hairline bg-white p-3 lg:hidden">
+      <div className="fixed inset-x-0 bottom-0 z-40 border-t border-hairline bg-white px-3 pt-3 pb-safe lg:hidden">
         <SubmitButton submitting={submitting} disabled={!selected} total={totals.total} onClick={() => void submit()} mobile />
       </div>
     </div>

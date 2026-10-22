@@ -33,8 +33,8 @@ export function Button({ variant = 'primary', size = 'md', arrow, magnetic, full
   const mag = magnetic ?? variant === 'primary'
 
   const cls = cn(
-    'relative inline-flex items-center justify-center gap-3 font-normal uppercase tracking-[0.5px] transition-colors duration-300 select-none',
-    variant !== 'link' && (size === 'lg' ? 'min-h-[48px] px-6 text-[15px]' : 'min-h-[42px] px-5 text-[14px]'),
+    'relative inline-flex items-center justify-center gap-3 font-normal uppercase tracking-[0.5px] transition-[background-color,border-color,transform] duration-300 ease-[var(--ease-ios)] select-none active:scale-[0.985]',
+    variant !== 'link' && (size === 'lg' ? 'min-h-[52px] px-6 text-[15px]' : 'min-h-[44px] px-5 text-[14px]'),
     variant === 'link' && 'text-[14px]',
     arrow && variant !== 'link' && 'justify-between',
     full && 'w-full',

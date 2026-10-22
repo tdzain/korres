@@ -12,9 +12,9 @@ export function Footer() {
           {FOOTER.map((col) => (
             <nav key={col.title} aria-label={col.title} className="gutter py-5 pb-8">
               <h2 className="t-caps text-brand">{col.title}</h2>
-              <ul className="mt-5 flex flex-col gap-2.5">
+              <ul className="mt-4 flex flex-col">
                 {col.links.map((l) => (
-                  <li key={l.label}><Link href={l.href} className="link-underline text-[14px] font-normal leading-5 text-brand" {...(l.href.startsWith('http') ? { target: '_blank', rel: 'noopener noreferrer' } : {})}>{l.label}</Link></li>
+                  <li key={l.label}><Link href={l.href} className="link-underline inline-flex min-h-9 items-center text-[14px] font-normal leading-5 text-brand" {...(l.href.startsWith('http') ? { target: '_blank', rel: 'noopener noreferrer' } : {})}>{l.label}</Link></li>
                 ))}
               </ul>
             </nav>

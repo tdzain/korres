@@ -7,6 +7,8 @@ const config: NextConfig = {
   images: { unoptimized: true },
   reactStrictMode: true,
   poweredByHeader: false,
+  // Transições de tela nativas (View Transitions API) com <ViewTransition> do React.
+  experimental: { viewTransition: true },
 }
 
 export default config
