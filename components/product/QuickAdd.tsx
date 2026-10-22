@@ -10,7 +10,7 @@ import type { ProductSummary } from '@/lib/commerce/types'
  * "Adicionar" que vira controle de quantidade (− 1 +) no próprio lugar, sem abrir o drawer:
  * no varejo brasileiro a pessoa costuma levar vários itens e ajustar a quantidade ali mesmo.
  */
-export function QuickAdd({ product: p, getSource, fly = true, className, size = 'md' }: { product: ProductSummary; getSource?: () => Element | null; fly?: boolean; className?: string; size?: 'md' | 'lg' }) {
+export function QuickAdd({ product: p, getSource, fly = true, flyTarget, className, size = 'md' }: { product: ProductSummary; getSource?: () => Element | null; fly?: boolean; flyTarget?: string; className?: string; size?: 'md' | 'lg' }) {
   const variant = p.variants[0]!
   const qty = useCart((s) => s.items.find((i) => i.variantId === variant.id)?.qty ?? 0)
   const setQty = useCart((s) => s.setQty)
@@ -28,7 +28,7 @@ export function QuickAdd({ product: p, getSource, fly = true, className, size = 
             animate={{ opacity: 1, scale: 1 }}
             exit={{ opacity: 0, scale: 0.97 }}
             transition={{ duration: 0.2, ease: [0.32, 0.72, 0, 1] }}
-            onClick={(e) => { e.preventDefault(); e.stopPropagation(); void addToBag({ slug: p.slug, variantId: variant.id, name: p.name, image: p.images[0]! }, 1, fly ? (getSource?.() ?? null) : null, { openDrawer: false, silent: true }) }}
+            onClick={(e) => { e.preventDefault(); e.stopPropagation(); void addToBag({ slug: p.slug, variantId: variant.id, name: p.name, image: p.images[0]! }, 1, fly ? (getSource?.() ?? null) : null, { openDrawer: false, silent: true, flyTarget }) }}
             className={cn('absolute inset-0 w-full border border-brand bg-brand text-[13px] uppercase tracking-[0.5px] text-white transition-colors active:bg-[#04106f]', 'hover:bg-[#0a14b8]')}
             data-testid="quick-add"
           >

@@ -20,6 +20,13 @@ export function DemoPanel() {
   useEffect(() => { setOpen(window.matchMedia('(min-width: 1024px)').matches) }, [])
   if (!enabled) return null
 
+  // Vai para uma PDP com ?live=N (força a live) ou sem o parâmetro (sorteio).
+  const setLive = (v: string) => {
+    const url = new URL(window.location.href)
+    if (!url.pathname.startsWith('/produto/')) url.pathname = '/produto/greek-yoghurt-serum-gel-anti-fadiga-para-olhos/'
+    if (v) url.searchParams.set('live', v); else url.searchParams.delete('live')
+    window.location.assign(url.toString())
+  }
   const approve = () => {
     const pending = useOrders.getState().orders.find((o) => o.status === 'awaiting_payment')
     if (!pending) { useToast.getState().push('Nenhum pedido aguardando pagamento'); return }
@@ -54,6 +61,12 @@ export function DemoPanel() {
               <option value="12">12h (antes do corte)</option>
               <option value="15">15h (depois do corte)</option>
             </select>
+            <p className="t-mono mb-1 mt-3">Live commerce (recarrega a PDP)</p>
+            <div className="grid grid-cols-5 gap-1">
+              {([['', 'Sorteio'], ['1', '1'], ['2', '2'], ['3', '3'], ['off', 'Off']] as const).map(([v, l]) => (
+                <button key={l} type="button" onClick={() => setLive(v)} className="border border-hairline px-1 py-1.5 text-brand hover:bg-tint">{l}</button>
+              ))}
+            </div>
             <div className="mt-3 grid gap-1">
               <button type="button" onClick={approve} className="bg-brand px-2 py-2 uppercase tracking-wide text-white">Simular Pix aprovado</button>
               <button type="button" onClick={reset} className="border border-hairline px-2 py-2 uppercase tracking-wide text-brand hover:bg-tint">Resetar sessão</button>

@@ -5,6 +5,8 @@ export const features = {
   /** Programa de pontos "Círculo Korres": desligado, a loja BR atual não tem o programa. */
   points: flag(process.env.NEXT_PUBLIC_FEATURE_POINTS, false),
   boleto: flag(process.env.NEXT_PUBLIC_FEATURE_BOLETO, true),
+  /** Live commerce na PDP (simulação para a Black Friday): mini player + modo ampliado com catálogo conectado. */
+  live: flag(process.env.NEXT_PUBLIC_FEATURE_LIVE, true),
   smoothScroll: flag(process.env.NEXT_PUBLIC_FEATURE_SMOOTH_SCROLL, false),
 } as const
 

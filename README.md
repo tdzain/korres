@@ -16,6 +16,7 @@ Protótipo navegável da loja KORRES Brasil com o **design system do korres.com*
 - **Venda híbrida:** no checkout, "Pagar em duas formas" divide o pedido em **Pix + cartão** ou em **dois cartões** (valor livre, mínimo R$ 10 por parte, atalhos 25/50/75%). A confirmação mostra o status de cada parte e o QR do Pix.
 - **Preencher com dados aleatórios:** no topo do checkout, "Preencher com dados aleatórios" (CPF válido, endereço real, cartões de teste) e "Preencher e finalizar" levam direto à confirmação com o QR Code.
 - **Concierge no WhatsApp:** botão flutuante que abre um cartão de concierge e continua a conversa no `wa.me` com contexto (página, itens da sacola, cidade).
+- **Live commerce na PDP (Black Friday):** mini player flutuante com uma de 3 lives sorteadas; ao tocar, abre em formato Reels com produtos da cena, chat simulado, adicionar à sacola e checkout expresso sem sair da transmissão. `?live=1|2|3|off` e seletor no `?demo=1`. Prompt reutilizável em [docs/PROMPT-LIVE-COMMERCE.md](docs/PROMPT-LIVE-COMMERCE.md).
 - **Assinatura:** *tdzain — Crafting. Building. Tailor-made.* (link para tdzain.com) no rodapé, no checkout e na confirmação.
 
 ## Como rodar
@@ -56,6 +57,7 @@ e2e/ tests/          Playwright e Vitest
 |---|---|---|
 | `NEXT_PUBLIC_FREE_SHIPPING_THRESHOLD` | `299` | Limite de frete grátis (Econômica); a barra do carrinho usa o mesmo valor |
 | `NEXT_PUBLIC_FEATURE_POINTS` | `false` | Programa de pontos "Círculo Korres" |
+| `NEXT_PUBLIC_FEATURE_LIVE` | `true` | Live commerce simulada na PDP |
 | `NEXT_PUBLIC_FEATURE_BOLETO` | `true` | Boleto no checkout |
 | `NEXT_PUBLIC_WHATSAPP_NUMBER` | vazio | Número do concierge (DDI+DDD+número, só dígitos). Vazio: o WhatsApp abre para escolher o contato |
 | `NEXT_PUBLIC_SITE_URL` | `https://korres-brasil.pages.dev` | URL base de metadados |

@@ -41,3 +41,8 @@
 | Concierge WhatsApp | FAB só depois da decisão de cookies; abre cartão com intenções e envia `wa.me` com contexto. Sem número configurado, `wa.me/?text=` deixa escolher o contato | Demonstração sem expor um número real |
 | Assinatura | `config/brand.ts` (`maker`) alimenta o componente `MadeBy` e os metadados `authors`/`creator` | Um único ponto de edição |
 | Grids no mobile | `grid` sem coluna base ganha `grid-cols-[minmax(0,1fr)]` | A trilha implícita `auto` crescia até o conteúdo (603 px) e causava rolagem horizontal no iPhone |
+| Live commerce (simulação) | `LiveRoot` na casca da loja com **um único `<video>`**; mini e ampliado só mudam o retângulo (animação de left/top/width/height) | Abrir sacola/sheet ou navegar entre PDPs nunca reinicia a transmissão |
+| Live: sorteio | Cliente, após hidratar; nunca repete a anterior (sessionStorage); `?live=1\|2\|3` força e `?live=off` desliga; seletor no painel `?demo=1` | Controle na apresentação; sem mismatch de SSR estático |
+| Live: compra | Sheet sobre o vídeo com checkout expresso (opção A): mesmo carrinho, `computeTotals`, `createOrder` e dados aleatórios do checkout | Fechar o pedido sem perder a transmissão |
+| Live: roteiro | `data/live.ts`; mapeamento cena→produto **inferido** dos quadros dos vídeos, a validar com a marca | Editável sem tocar em componentes |
+| Live: flag | `NEXT_PUBLIC_FEATURE_LIVE` (padrão ligado) | Desligar sem remover código |
